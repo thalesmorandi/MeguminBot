@@ -53,6 +53,7 @@ async def on_ready():
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
 
 
+
 #MEMBRO NOVO
 @bot.event
 async def on_member_join(member):
