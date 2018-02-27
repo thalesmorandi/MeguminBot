@@ -66,13 +66,12 @@ async def on_ready():
 #MEMBRO NOVO ##TRABALHANDO NA RE=ESCRITA
 @bot.event
 async def on_member_join(member):
-    client = discord.Client()
 	#Envia uma mensagem privada de boas vindas com o nome do servidor e mencionando o usuario
-    await client.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention)
-    await client.send_message(bot.get_channel('416924036048617473'), ' '+ member.mention)
+    await bot.say(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention)
+    await bot.say(bot.get_channel('416924036048617473'), ' '+ member.mention)
     #Adiciona o cargo "Membro" ao membro que entrou
     role = discord.utils.find(lambda r: r.name == "Membro", member.server.roles)
-    await bot.add_roles(member, role)	
+    await bot.add_roles(member, role)
 
 #=================================================COMANDOS=================================================#
 
@@ -168,7 +167,7 @@ async def youtube(ctx, search='trololo'):
 async def py(ctx, code):
     """Auto formatação."""
     code = ctx.message.content
-    code = re.sub('!py ', '', code)
+    code = re.sub('!py', '', code)
     code = re.sub('`', '´', code)
     await bot.delete_message(ctx.message)
     await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
@@ -186,8 +185,6 @@ async def gif(ctx, stag='migemun'):
 	url=r['data']
 	url=str(url['url'])
 	await bot.say(url)
-	await bot.say(stag)
-
 
 #LEGAL
 @bot.command(pass_context=True)
