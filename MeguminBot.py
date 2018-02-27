@@ -37,8 +37,7 @@ def getUser(name, msg):
     return None
 
 #==================================================EVENTOS==================================================#
-
-
+#BOT START
 @bot.event
 async def on_ready():
 	print('Logada como '+bot.user.name+' (ID:'+bot.user.id+') | Conectada a '+str(len(bot.servers))+' seridores | Em contato com '+str(len(set(bot.get_all_members())))+' usuarios')
@@ -52,6 +51,17 @@ async def on_ready():
 	print('Github Link: https://github.com/ThalesMorandi/Meguminbot')
 	print('-------------------------------------------------------------------------------------------------')
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
+
+
+#MEMBRO NOVO
+@bot.event
+async def on_member_join(member):
+    #Envia uma mensagem privada de boas vindas com o nome do servidor e mencionando o usuario
+    await client.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention)
+    await client.send_message(bot.get_channel('416924036048617473'), ' '+ member.mention)
+    #Adiciona o cargo "Membro" ao membro que entrou
+    role = discord.utils.find(lambda r: r.name == "Membro", member.server.roles)
+    await client.add_roles(member, role)	
 
 #=================================================COMANDOS=================================================#
 
