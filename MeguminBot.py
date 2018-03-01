@@ -1,7 +1,5 @@
 import discord
 import asyncio
-from discord.ext.commands import Bot
-from discord.ext import commands
 import platform
 import json
 import io
@@ -18,6 +16,8 @@ import websockets
 import secrets
 import string
 import pickle
+from discord.ext.commands import Bot
+from discord.ext import commands
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
@@ -72,6 +72,8 @@ async def randomstring(N:int):
 
 
 #==================================================EVENTOS==================================================#
+
+
 @bot.event
 async def on_ready():
 	print('Logada como '+bot.user.name+' (ID:'+bot.user.id+') | Conectada a '+str(len(bot.servers))+' seridores | Em contato com '+str(len(set(bot.get_all_members())))+' usuarios')
@@ -95,6 +97,7 @@ async def on_member_join(member):
 	
 #=================================================CODIGOS=================================================#
 
+
 @bot.event
 async def on_message(message):
 	if message.content.startswith(codigo) and message.channel.id == canal_codigo:
@@ -103,19 +106,25 @@ async def on_message(message):
 		await attcodigo()
 		await bot.add_roles(message.author, cargomembro)
 		await bot.remove_roles(message.author, cargoindigente)
+	
+	
+	if message.author.id == "397606105594986499":
+		await bot.add_reaction(message, '🇹')
+		await bot.add_reaction(message, '🇪')
+		await bot.add_reaction(message, '💖')
+		await bot.add_reaction(message, '🇦')
+		await bot.add_reaction(message, '🇲')
+		await bot.add_reaction(message, '🇴')
+	
 	await bot.process_commands(message)
 
 
 #=================================================COMANDOS=================================================#
 
-#SENHA
-@bot.command(pass_context=True)
-async def senha(ctx, N:int):
-	codigos = await randomstring(N)
-	await bot.say(codigos)
-@senha.error
-async def senha_error(ctx, error):
-	await bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
+
+			
+
+
 
 
 #APELIDO
@@ -138,11 +147,11 @@ async def apelido_error(ctx, error):
 @bot.command(pass_context=True)
 async def cat(ctx):
 	"""Envia um catineo aleatorio."""	
-	async with aiohttp.get('http://random.cat/meow') as r:
-		if r.status == 200:
-			js = await r.json()
-			#await bot.say(js['file'])
-			await bot.say(embed=discord.Embed().set_image(url=js['file']))
+	async with aiohttp.ClientSession() as session:
+		async with session.get('http://random.cat/meow') as r:
+			if r.status == 200:
+				js = await r.json()
+				await bot.say(embed=discord.Embed().set_image(url=js['file']))
 
 
 #CONVITE
@@ -150,6 +159,33 @@ async def cat(ctx):
 async def convite():
 	"""Envia um convite do servidor."""
 	await bot.say('discord.gg/V2WUn6M')
+
+#DELETE
+@bot.command(pass_context=True)
+async def delete(ctx, amount, channel: discord.Channel=None):
+	"""Deleta a quantidade de mensagens desejada !delete <quantidade>."""
+	channel = channel or ctx.message.channel
+	deleteds = 0
+	total = amount
+	try:
+		amount = int(amount)
+		await bot.delete_message(ctx.message)
+		if amount > 100:
+			amountdiv = int(amount/100)
+			amountrest = amount-(amountdiv*100)
+			print(amountdiv)
+			print(amountrest)
+			for amount in range(amount, amountrest, -100):
+				deleted = await bot.purge_from(channel, limit=amount)
+				deleteds = deleteds + len(deleted)
+		else:
+			deleted = await bot.purge_from(channel, limit=amount)
+			deleteds = deleteds + len(deleted)
+	except ValueError:
+		await bot.say('Utilize o comando com uma quantidade valida : ```!delete <quantidade>```')
+	botmsgdelete = await bot.send_message(ctx.message.channel,'Deletei {} mensagens de um pedido de {} no canal {} para {}'.format(deleteds, total, channel.mention,ctx.message.author.mention))
+	await asyncio.sleep(5)
+	await bot.delete_message(botmsgdelete)
 
 
 #DIZ
@@ -168,10 +204,11 @@ async def diz_error(error):
 @bot.command(pass_context=True)
 async def dog(ctx):
 	"""Envia um catiorineo aleatorio."""
-	async with aiohttp.get('https://dog.ceo/api/breeds/image/random') as r:
-		if r.status == 200:
-			js = await r.json()
-			await bot.say(embed=discord.Embed().set_image(url=js['message']))
+	async with aiohttp.ClientSession() as session:
+		async with session.get('https://dog.ceo/api/breeds/image/random')	as r:	
+			if r.status == 200:
+				js = await r.json()
+				await bot.say(embed=discord.Embed().set_image(url=js['message']))
 
 
 #ENTROU
@@ -182,33 +219,6 @@ async def entrou(ctx, member: discord.Member = None):
 		member = ctx.message.author
 	tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
 	await bot.say('{0.mention} entrou aqui {1}'.format(member, tempo))
-
-
-#YOUTUBE
-@bot.command(aliases=['yt', 'vid', 'video'])
-async def youtube(*, search:str):
-	"""Envia o primeiro resultado da pesquisa no youtube !youtube <pesquisa>."""
-	#search = re.sub('!yt ', '', ctx.message.content)
-	#search = re.sub('!youtube ', '', search)
-	#search = search.replace(' ', '+').lower()
-	response = requests.get(f"https://www.youtube.com/results?search_query={search}").text
-	result = BeautifulSoup(response, "lxml")
-	dir_address = f"{result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')}"
-	output=f"https://www.youtube.com{dir_address}"
-	await bot.say(output)
-
-
-#PY
-@bot.command(pass_context=True)
-async def py(ctx, *, code:str):
-	"""Auto formatação."""
-	code = re.sub('`', '´', code)
-	await bot.delete_message(ctx.message)
-	await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
-	await bot.say('**~> ` <~ (CRÁSES)  são trocadas por  (AGUDO) ~> ´ <~**')
-@py.error
-async def py_error(ctx, error):
-	await bot.say('Use o comando corretamente digitando !py <codigo>')
 
 
 #GIF
@@ -225,7 +235,7 @@ async def gif(*, stag:str):
 	id=gif_data["id"]
 	url = "https://media.giphy.com/media/"+id+"/giphy.gif"
 	await bot.say(embed=discord.Embed().set_image(url=url))
-		
+
 
 #LEGAL
 @bot.command(pass_context=True)
@@ -262,6 +272,18 @@ async def ping(ctx):
 	await bot.say(":ping_pong: Pong! com {}ms".format(s))
 
 
+#PY
+@bot.command(pass_context=True)
+async def py(ctx, *, code:str):
+	"""Auto formatação."""
+	code = re.sub('`', '´', code)
+	await bot.delete_message(ctx.message)
+	await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
+	await bot.say('**~> ` <~ (CRÁSES)  são trocadas por  (AGUDO) ~> ´ <~**')
+@py.error
+async def py_error(ctx, error):
+	await bot.say('Use o comando corretamente digitando !py <codigo>')
+
 #REPETE
 @bot.command()
 async def repete(x : int,* , content='repetindo...'):
@@ -269,6 +291,31 @@ async def repete(x : int,* , content='repetindo...'):
 	for i in range(x):
 		await asyncio.sleep(1)
 		await bot.say(content)
+
+
+#SENHA
+@bot.command(pass_context=True)
+async def senha(ctx, N:int):
+	"""Gera uma senha de acordo com a quantidade de caracteres solicitada !senha <quantidade>."""
+	codigos = await randomstring(N)
+	await bot.say(codigos)
+@senha.error
+async def senha_error(ctx, error):
+	await bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
+		
+
+#YOUTUBE
+@bot.command(aliases=['yt', 'vid', 'video'])
+async def youtube(*, search:str):
+	"""Envia o primeiro resultado da pesquisa no youtube !youtube <pesquisa>."""
+	#search = re.sub('!yt ', '', ctx.message.content)
+	#search = re.sub('!youtube ', '', search)
+	#search = search.replace(' ', '+').lower()
+	response = requests.get(f"https://www.youtube.com/results?search_query={search}").text
+	result = BeautifulSoup(response, "lxml")
+	dir_address = f"{result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')}"
+	output=f"https://www.youtube.com{dir_address}"
+	await bot.say(output)
 
 	
 bot.run(token)
