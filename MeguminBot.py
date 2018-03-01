@@ -108,7 +108,7 @@ async def on_message(message):
 		await bot.remove_roles(message.author, cargoindigente)
 	
 	
-	if message.author.id == "397606105594986499":
+	if message.author.id == "397606105594986499" and not message.content.startswith('!'):
 		await bot.add_reaction(message, '🇹')
 		await bot.add_reaction(message, '🇪')
 		await bot.add_reaction(message, '💖')
@@ -120,12 +120,6 @@ async def on_message(message):
 
 
 #=================================================COMANDOS=================================================#
-
-
-			
-
-
-
 
 #APELIDO
 @bot.command(pass_context=True)
