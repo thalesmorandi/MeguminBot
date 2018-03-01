@@ -9,44 +9,69 @@ import safygiphy
 import bs4
 import urllib.parse
 import requests
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
 import lxml
-
-#token imports
 import config
-#legal/moeda imports
 import random
-#getUser imports
 import re
-#cats imports
 import aiohttp
 import websockets
-#ping imports
+import secrets
+import string
+import pickle
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+from urllib.request import urlopen
+
+#=================================================**BOT**=================================================#
 
 
-token = config.bottoken
 bot = Bot(description="Uma maga disposta a fazer muitos truques por vc (づ｡◕‿‿◕｡)づ", command_prefix=commands.when_mentioned_or('!'), pm_help = False)
-	
-#função p pegar qualquer user pelo ID ou Name, necessita atrelar a var server pro server de pesquisa
-def getUser(name, msg):
-    server = msg.server
-    if name == None:
-        return None
-    if name == '' or name == ' ':
-        return None
-    if re.search(r'\d{17,18}', name):
-        name = re.search(r'\d{17,18}', name).group(0)
-        print(name)
-    for n in server.members:
-        if re.search( name, n.name + n.discriminator, re.I) or re.search( name, n.display_name, re.I) or name == n.id:
-            return n
-    print('getUser invalid name or id')
-    return None
+
+
+#=================================================VARIAVEIS=================================================#
+
+myfile = open("codigo/codigo.txt", "r")
+codigo=myfile.read()
+msgcodeler = open('codigo/msgcodearq.p', 'rb')
+msgcode = pickle.load(msgcodeler)
+canal_codigo = '417822182379356190'
+canal_logbv = '416924036048617473'
+cargo_membro = 'Membro'
+cargo_indigente = 'Indigente'
+token = config.bottoken
+
+
+#=================================================FUNÇÕES=================================================#
+
+
+async def attcodigo():
+	N = random.randint(8, 12)
+	global msgcode
+	global codigo
+	codigo = await randomstring(N)
+	msgcode = await bot.edit_message(msgcode, 'Coloque o codigo abaixo em #codigo para ter seu cargo de membro e poder usar o resto do nosso servidor: \n'+ codigo)
+	await salvarcode()
+	await salvarmsgcode()
+
+
+async def salvarcode():
+	codigoarq = open('codigo/codigo.txt', 'w')
+	codigoarq.write(codigo)
+async def salvarmsgcode():
+	msgcodearq = open('codigo/msgcodearq.p', 'wb')
+	pickle.dump(msgcode, msgcodearq)
+
+
+async def randomstring(N:int):
+	if N == None:
+		N = 8
+	randomstring : str
+	randomstring = ''
+	randomstring = randomstring.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(N))
+	return randomstring
+
 
 #==================================================EVENTOS==================================================#
-#BOT START
 @bot.event
 async def on_ready():
 	print('Logada como '+bot.user.name+' (ID:'+bot.user.id+') | Conectada a '+str(len(bot.servers))+' seridores | Em contato com '+str(len(set(bot.get_all_members())))+' usuarios')
@@ -60,42 +85,53 @@ async def on_ready():
 	print('Github Link: https://github.com/ThalesMorandi/MeguminBot')
 	print('-------------------------------------------------------------------------------------------------')
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
+	
 
-
-
-#MEMBRO NOVO ##TRABALHANDO NA RE=ESCRITA
 @bot.event
 async def on_member_join(member):
-	#Envia uma mensagem privada de boas vindas com o nome do servidor e mencionando o usuario
-    await bot.say(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention)
-    await bot.say(bot.get_channel('416924036048617473'), ' '+ member.mention)
-    #Adiciona o cargo "Membro" ao membro que entrou
-    role = discord.utils.find(lambda r: r.name == "Membro", member.server.roles)
-    await bot.add_roles(member, role)
+	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\n Leias as regras para ter acesso completo ao servidor.')
+	cargo = discord.utils.find(lambda r: r.name == cargo_indigente, member.server.roles)
+	await bot.add_roles(member, cargo)
+	
+#=================================================CODIGOS=================================================#
+
+@bot.event
+async def on_message(message):
+	if message.content.startswith(codigo) and message.channel.id == canal_codigo:
+		cargomembro = discord.utils.find(lambda r: r.name == cargo_membro, message.server.roles)
+		cargoindigente = discord.utils.find(lambda r: r.name == cargo_indigente, message.server.roles)
+		await attcodigo()
+		await bot.add_roles(message.author, cargomembro)
+		await bot.remove_roles(message.author, cargoindigente)
+	await bot.process_commands(message)
+
 
 #=================================================COMANDOS=================================================#
 
+#SENHA
+@bot.command(pass_context=True)
+async def senha(ctx, N:int):
+	codigos = await randomstring(N)
+	await bot.say(codigos)
+@senha.error
+async def senha_error(ctx, error):
+	await bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
+
+
 #APELIDO
 @bot.command(pass_context=True)
-async def apelido(ctx, nome):
-	"""Altera seu apelido para um desejado /apelido "novo apelido" (com aspas para apelidos com espaço)."""
+async def apelido(ctx, *, nome: str = None):
+	"""Altera seu apelido para um desejado /apelido novo apelido."""
 	membro = ctx.message.author
-	if nome == '' or nome == ' ': 
-		await bot.say('Utilize o comando corretamente digitando ```!apelido <"apelido novo">```')
-	else: 
-		if ctx.message.author.nick != None:
-			apelidoold = ctx.message.author.nick
-		else:
-			apelidoold = ctx.message.author.name
-		try:
-			await bot.change_nickname(membro, nome)
-			await bot.say('Alterando o apelido do membro : {0.mention} que era \'**'.format(membro)+apelidoold+'**\' para : \'** '+nome+' **\' ')
-		except discord.errors.Forbidden:
-			await bot.say('Não foi possivel realizar o pedido.')
+	if ctx.message.author.nick != None:
+		apelidoold = ctx.message.author.nick
+	else:
+		apelidoold = ctx.message.author.name
+	await bot.change_nickname(membro, nome)
+	await bot.say('Alterando o apelido do membro : {0.mention} que era \'**'.format(membro)+apelidoold+'**\' para : \'** '+nome+' **\' ')
 @apelido.error
 async def apelido_error(ctx, error):
-	#if isinstance(error, command.MissingRequiredArgument):
-	await bot.say('Utilize o comando corretamente digitando ```!apelido <"apelido novo">```')
+	await bot.say('Utilize o comando corretamente digitando ```!apelido apelido novo```')
 
 
 #CAT
@@ -105,7 +141,8 @@ async def cat(ctx):
 	async with aiohttp.get('http://random.cat/meow') as r:
 		if r.status == 200:
 			js = await r.json()
-			await bot.say(js['file'])
+			#await bot.say(js['file'])
+			await bot.say(embed=discord.Embed().set_image(url=js['file']))
 
 
 #CONVITE
@@ -113,15 +150,16 @@ async def cat(ctx):
 async def convite():
 	"""Envia um convite do servidor."""
 	await bot.say('discord.gg/V2WUn6M')
-		
+
 
 #DIZ
 @bot.command()
-async def diz(content):
+async def diz(*, msg: str):
 	"""Repete uma mensagem /diz"""
-	await bot.say(content)
+	msg = re.sub('´', '`', msg)
+	await bot.say(msg)
 @diz.error
-async def diz_error(ctx, error):
+async def diz_error(error):
 	#if isinstance(error, command.MissingRequiredArgument):
 	await bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
 
@@ -130,10 +168,10 @@ async def diz_error(ctx, error):
 @bot.command(pass_context=True)
 async def dog(ctx):
 	"""Envia um catiorineo aleatorio."""
-	async with aiohttp.get('https://random.dog/woof.json') as r:
+	async with aiohttp.get('https://dog.ceo/api/breeds/image/random') as r:
 		if r.status == 200:
 			js = await r.json()
-			await bot.say(js['url'])	
+			await bot.say(embed=discord.Embed().set_image(url=js['message']))
 
 
 #ENTROU
@@ -145,46 +183,49 @@ async def entrou(ctx, member: discord.Member = None):
 	tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
 	await bot.say('{0.mention} entrou aqui {1}'.format(member, tempo))
 
+
 #YOUTUBE
-@bot.command(pass_context=True, aliases=['yt', 'vid', 'video'])
-async def youtube(ctx, search='trololo'):
+@bot.command(aliases=['yt', 'vid', 'video'])
+async def youtube(*, search:str):
 	"""Envia o primeiro resultado da pesquisa no youtube !youtube <pesquisa>."""
-	search = re.sub('!yt ', '', ctx.message.content)
-	search = re.sub('!youtube ', '', search)
-	search = search.replace(' ', '+').lower()
+	#search = re.sub('!yt ', '', ctx.message.content)
+	#search = re.sub('!youtube ', '', search)
+	#search = search.replace(' ', '+').lower()
 	response = requests.get(f"https://www.youtube.com/results?search_query={search}").text
 	result = BeautifulSoup(response, "lxml")
 	dir_address = f"{result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')}"
 	output=f"https://www.youtube.com{dir_address}"
 	await bot.say(output)
-#@youtube.error
-#async def youtube_error(ctx, error):
-	#await bot.say('Utilize o comando corretamente digitando ```!youtube <"pesquisa">```')
 
 
 #PY
 @bot.command(pass_context=True)
-async def py(ctx, code):
-    """Auto formatação."""
-    code = ctx.message.content
-    code = re.sub('!py', '', code)
-    code = re.sub('`', '´', code)
-    await bot.delete_message(ctx.message)
-    await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
-    await bot.say('**~> ` <~ (CRÁSES)  são trocadas por  (AGUDO) ~> ´ <~**')
+async def py(ctx, *, code:str):
+	"""Auto formatação."""
+	code = re.sub('`', '´', code)
+	await bot.delete_message(ctx.message)
+	await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
+	await bot.say('**~> ` <~ (CRÁSES)  são trocadas por  (AGUDO) ~> ´ <~**')
+@py.error
+async def py_error(ctx, error):
+	await bot.say('Use o comando corretamente digitando !py <codigo>')
 
 
 #GIF
-@bot.command(pass_context=True)
-async def gif(ctx, stag='migemun'):
+@bot.command()
+async def gif(*, stag:str):
 	"""Envia um gif aleatorio com a tag escolhida !gif <tags>."""
-	msg = ctx.message.content
-	stag = re.sub('!gif ', '', msg)
+	#msg = ctx.message.content
+	#stag = re.sub('!gif ', '', msg)
 	g = safygiphy.Giphy(token='rener21BaDh2WcIgmARoUpAZcDBAGaR3')
-	r = g.random(tag=stag)
-	url=r['data']
-	url=str(url['url'])
-	await bot.say(url)
+	r = g.search(q=stag, limit=25)
+	gif_dataa=r['data']
+	escolha = random.randint(0, 3)
+	gif_data=gif_dataa[escolha]
+	id=gif_data["id"]
+	url = "https://media.giphy.com/media/"+id+"/giphy.gif"
+	await bot.say(embed=discord.Embed().set_image(url=url))
+		
 
 #LEGAL
 @bot.command(pass_context=True)
@@ -223,7 +264,7 @@ async def ping(ctx):
 
 #REPETE
 @bot.command()
-async def repete(x : int, content='repetindo...'):
+async def repete(x : int,* , content='repetindo...'):
 	"""Repete uma mensagem x vezes /repete x msg."""
 	for i in range(x):
 		await asyncio.sleep(1)
