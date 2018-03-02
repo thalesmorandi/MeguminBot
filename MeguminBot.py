@@ -8,7 +8,6 @@ import bs4
 import urllib.parse
 import requests
 import lxml
-import config
 import random
 import re
 import aiohttp
@@ -16,12 +15,18 @@ import websockets
 import secrets
 import string
 import pickle
+import os
 from discord.ext.commands import Bot
 from discord.ext import commands
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-
+is_prod = os.environ.get('IS_HEROKU', None)
+if is_prod:
+	token = os.environ.get('TOKEN')
+else:
+	import config
+	token = config.bottoken
 #=================================================**BOT**=================================================#
 
 
@@ -86,6 +91,7 @@ async def on_ready():
 	print('Servidor Discord : https://discord.me/discordialol')
 	print('Github Link: https://github.com/ThalesMorandi/MeguminBot')
 	print('-------------------------------------------------------------------------------------------------')
+	print(is_prod)
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
 	
 
