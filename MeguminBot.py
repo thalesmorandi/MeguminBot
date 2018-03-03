@@ -45,7 +45,6 @@ codigo=codigofile.read()
 canal_codigo = '417822182379356190'
 canal_logbv = '416924036048617473'
 cargo_membro = 'Membro'
-token = config.bottoken
 
 #=================================================FUNÇÕES=================================================#
 
