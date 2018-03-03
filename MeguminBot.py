@@ -14,13 +14,17 @@ import aiohttp
 import websockets
 import secrets
 import string
-import pickle
 import os
+import traceback
+from os import listdir
+from os.path import isfile, join
 from discord.ext.commands import Bot
 from discord.ext import commands
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from utils import functions, report, perms, rolechange
+
 is_prod = os.environ.get('IS_HEROKU', None)
 if is_prod:
 	token = os.environ.get('TOKEN')
@@ -29,42 +33,36 @@ else:
 	token = config.bottoken
 #=================================================**BOT**=================================================#
 
-
+client = discord.Client()
 bot = Bot(description="Uma maga disposta a fazer muitos truques por vc (づ｡◕‿‿◕｡)づ", command_prefix=commands.when_mentioned_or('!'), pm_help = False)
-
 
 #=================================================VARIAVEIS=================================================#
 
-myfile = open("codigo/codigo.txt", "r")
-codigo=myfile.read()
-msgcodeler = open('codigo/msgcodearq.p', 'rb')
-msgcode = pickle.load(msgcodeler)
+msgcount = 0
+cogs_dir = "cogs"
+codigofile = open("codigo/codigo.txt", "r")
+codigo=codigofile.read()
 canal_codigo = '417822182379356190'
 canal_logbv = '416924036048617473'
 cargo_membro = 'Membro'
-cargo_indigente = 'Indigente'
 token = config.bottoken
-
 
 #=================================================FUNÇÕES=================================================#
 
-
 async def attcodigo():
-	N = random.randint(8, 12)
-	global msgcode
+	server = list(bot.servers)[0]
+	channelcodigo=discord.utils.get(server.channels, name="regras")	
+	msgcode = await bot.get_message(channel=discord.utils.get(server.channels, name="regras"), id="418680566183886848")
+	N = random.randint(8, 12)	
 	global codigo
 	codigo = await randomstring(N)
-	msgcode = await bot.edit_message(msgcode, 'Coloque o codigo abaixo em #codigo para ter seu cargo de membro e poder usar o resto do nosso servidor: \n'+ codigo)
+	await bot.edit_message(msgcode, '**Coloque o codigo abaixo em #codigo para ter seu cargo de membro e poder usar o resto do nosso servidor:** \n codigo = ``'+ codigo +'``')
 	await salvarcode()
-	await salvarmsgcode()
 
 
 async def salvarcode():
 	codigoarq = open('codigo/codigo.txt', 'w')
 	codigoarq.write(codigo)
-async def salvarmsgcode():
-	msgcodearq = open('codigo/msgcodearq.p', 'wb')
-	pickle.dump(msgcode, msgcodearq)
 
 
 async def randomstring(N:int):
@@ -92,14 +90,19 @@ async def on_ready():
 	print('Github Link: https://github.com/ThalesMorandi/MeguminBot')
 	print('-------------------------------------------------------------------------------------------------')
 	print(is_prod)
+	await attcodigo()
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
 	
 
 @bot.event
 async def on_member_join(member):
-	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\n Leias as regras para ter acesso completo ao servidor.')
+	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\nLeias as regras para ter acesso completo ao servidor.')
 	cargo = discord.utils.find(lambda r: r.name == cargo_indigente, member.server.roles)
 	await bot.add_roles(member, cargo)
+	global canal_logbv
+	canal_logbv = discord.utils.find(lambda r: r.id == canal_logbv, member.server.channels)
+	tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
+	await bot.send_message(canal_logbv, '{0.mention} entrou aqui no dia {1}'.format(member, tempo))
 	
 #=================================================CODIGOS=================================================#
 
@@ -108,12 +111,10 @@ async def on_member_join(member):
 async def on_message(message):
 	if message.content.startswith(codigo) and message.channel.id == canal_codigo:
 		cargomembro = discord.utils.find(lambda r: r.name == cargo_membro, message.server.roles)
-		cargoindigente = discord.utils.find(lambda r: r.name == cargo_indigente, message.server.roles)
 		await attcodigo()
 		await bot.add_roles(message.author, cargomembro)
-		await bot.remove_roles(message.author, cargoindigente)
-	
-	
+
+
 	if message.author.id == "397606105594986499" and not message.content.startswith('!'):
 		await bot.add_reaction(message, '🇹')
 		await bot.add_reaction(message, '🇪')
@@ -121,44 +122,20 @@ async def on_message(message):
 		await bot.add_reaction(message, '🇦')
 		await bot.add_reaction(message, '🇲')
 		await bot.add_reaction(message, '🇴')
+	global msgcount
+	msgcount +=1
 	
 	await bot.process_commands(message)
 
 
 #=================================================COMANDOS=================================================#
 
-#APELIDO
-@bot.command(pass_context=True)
-async def apelido(ctx, *, nome: str = None):
-	"""Altera seu apelido para um desejado /apelido novo apelido."""
-	membro = ctx.message.author
-	if ctx.message.author.nick != None:
-		apelidoold = ctx.message.author.nick
-	else:
-		apelidoold = ctx.message.author.name
-	await bot.change_nickname(membro, nome)
-	await bot.say('Alterando o apelido do membro : {0.mention} que era \'**'.format(membro)+apelidoold+'**\' para : \'** '+nome+' **\' ')
-@apelido.error
-async def apelido_error(ctx, error):
-	await bot.say('Utilize o comando corretamente digitando ```!apelido apelido novo```')
-
-
-#CAT
-@bot.command(pass_context=True)
-async def cat(ctx):
-	"""Envia um catineo aleatorio."""	
-	async with aiohttp.ClientSession() as session:
-		async with session.get('http://random.cat/meow') as r:
-			if r.status == 200:
-				js = await r.json()
-				await bot.say(embed=discord.Embed().set_image(url=js['file']))
-
-
 #CONVITE
 @bot.command()
 async def convite():
 	"""Envia um convite do servidor."""
 	await bot.say('discord.gg/V2WUn6M')
+	print(msgcode)
 
 #DELETE
 @bot.command(pass_context=True)
@@ -173,8 +150,6 @@ async def delete(ctx, amount, channel: discord.Channel=None):
 		if amount > 100:
 			amountdiv = int(amount/100)
 			amountrest = amount-(amountdiv*100)
-			print(amountdiv)
-			print(amountrest)
 			for amount in range(amount, amountrest, -100):
 				deleted = await bot.purge_from(channel, limit=amount)
 				deleteds = deleteds + len(deleted)
@@ -189,52 +164,15 @@ async def delete(ctx, amount, channel: discord.Channel=None):
 
 
 #DIZ
-@bot.command()
-async def diz(*, msg: str):
+@bot.command(pass_context=True)
+async def diz(ctx, *, msg: str):
 	"""Repete uma mensagem /diz"""
 	msg = re.sub('´', '`', msg)
 	await bot.say(msg)
 @diz.error
-async def diz_error(error):
-	#if isinstance(error, command.MissingRequiredArgument):
-	await bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
-
-
-#DOG
-@bot.command(pass_context=True)
-async def dog(ctx):
-	"""Envia um catiorineo aleatorio."""
-	async with aiohttp.ClientSession() as session:
-		async with session.get('https://dog.ceo/api/breeds/image/random')	as r:	
-			if r.status == 200:
-				js = await r.json()
-				await bot.say(embed=discord.Embed().set_image(url=js['message']))
-
-
-#ENTROU
-@bot.command(pass_context=True)
-async def entrou(ctx, member: discord.Member = None):
-	"""Informa quando você ou membro marcado entrou no servidor."""
-	if member is None:
-		member = ctx.message.author
-	tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
-	await bot.say('{0.mention} entrou aqui {1}'.format(member, tempo))
-
-
-#GIF
-@bot.command()
-async def gif(*, stag:str):
-	"""Envia um gif aleatorio com a tag escolhida !gif <tags>."""
-	#msg = ctx.message.content
-	#stag = re.sub('!gif ', '', msg)
-	g = safygiphy.Giphy(token='rener21BaDh2WcIgmARoUpAZcDBAGaR3')
-	r = g.search(q=stag, limit=25)
-	gif_dataa=r['data']
-	escolha = random.randint(0, 3)
-	gif_data=gif_dataa[escolha]
-	id=gif_data["id"]
-	url = "https://media.giphy.com/media/"+id+"/giphy.gif"
-	await bot.say(embed=discord.Embed().set_image(url=url))
+async def diz_error(ctx, error):
+	if Exception == 'BadArgument':
+		await bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
 
 
 #LEGAL
@@ -250,18 +188,6 @@ async def legal(ctx, member: discord.Member = None):
 		await bot.say('Sim, {0.mention} é legal.'.format(member))
 
 
-#MOEDA
-@bot.command(pass_context=True)
-async def moeda(ctx):
-	"""Irá sortear entre cara ou coroa."""
-	message = ctx.message
-	escolha = random.randint(1, 2)
-	if escolha == 1:
-		await bot.add_reaction(message, '😀')
-	if escolha == 2:
-		await bot.add_reaction(message, '👑')
-
-
 #PING		
 @bot.command(pass_context=True)
 async def ping(ctx):
@@ -271,18 +197,6 @@ async def ping(ctx):
 	s = d.seconds * 1000 + d.microseconds // 1000
 	await bot.say(":ping_pong: Pong! com {}ms".format(s))
 
-
-#PY
-@bot.command(pass_context=True)
-async def py(ctx, *, code:str):
-	"""Auto formatação."""
-	code = re.sub('`', '´', code)
-	await bot.delete_message(ctx.message)
-	await bot.say('**{0} Enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
-	await bot.say('**~> ` <~ (CRÁSES)  são trocadas por  (AGUDO) ~> ´ <~**')
-@py.error
-async def py_error(ctx, error):
-	await bot.say('Use o comando corretamente digitando !py <codigo>')
 
 #REPETE
 @bot.command()
@@ -302,20 +216,16 @@ async def senha(ctx, N:int):
 @senha.error
 async def senha_error(ctx, error):
 	await bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
-		
 
-#YOUTUBE
-@bot.command(aliases=['yt', 'vid', 'video'])
-async def youtube(*, search:str):
-	"""Envia o primeiro resultado da pesquisa no youtube !youtube <pesquisa>."""
-	#search = re.sub('!yt ', '', ctx.message.content)
-	#search = re.sub('!youtube ', '', search)
-	#search = search.replace(' ', '+').lower()
-	response = requests.get(f"https://www.youtube.com/results?search_query={search}").text
-	result = BeautifulSoup(response, "lxml")
-	dir_address = f"{result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')}"
-	output=f"https://www.youtube.com{dir_address}"
-	await bot.say(output)
 
-	
+if __name__ == "__main__":
+    for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+        try:
+            bot.load_extension(cogs_dir + "." + extension)
+            print(f'{extension} carregada com sucesso.')
+        except Exception as e:
+            print(f'erro ao carregar {extension}.')
+            traceback.print_exc()
+
+
 bot.run(token)
