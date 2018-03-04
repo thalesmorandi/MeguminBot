@@ -63,7 +63,7 @@ class Membro():
         """Informa o level do membro ou seu."""
         if member is None:
             member = ctx.message.author       
-        level = await user_bd.get_local_level(message.server.id, member.id)
+        level = await user_bd.get_local_level(ctx.message.server.id, member.id)
         embedlevel = discord.Embed(title='{.name}'.format(member), description='É level : {}'.format(level))
         await self.bot.send_message(ctx.message.channel, embed=embedlevel)              
 
