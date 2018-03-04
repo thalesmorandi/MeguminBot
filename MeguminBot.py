@@ -16,6 +16,7 @@ import secrets
 import string
 import os
 import traceback
+from utils import user_bd
 from os import listdir
 from os.path import isfile, join
 from discord.ext.commands import Bot
@@ -50,7 +51,6 @@ cargo_membro = 'Membro'
 
 async def attcodigo():
 	server = list(bot.servers)[0]
-	channelcodigo=discord.utils.get(server.channels, name="regras")	
 	msgcode = await bot.get_message(channel=discord.utils.get(server.channels, name="regras"), id="418680566183886848")
 	N = random.randint(8, 12)	
 	global codigo
@@ -95,14 +95,13 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\nLeias as regras para ter acesso completo ao servidor.')
-	cargo = discord.utils.find(lambda r: r.name == cargo_indigente, member.server.roles)
-	await bot.add_roles(member, cargo)
-	global canal_logbv
-	canal_logbv = discord.utils.find(lambda r: r.id == canal_logbv, member.server.channels)
 	tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
-	await bot.send_message(canal_logbv, '{0.mention} entrou aqui no dia {1}'.format(member, tempo))
+	server = member.server
+	canal = discord.utils.get(server.channels, name="membrosnovos")
+	await bot.send_message(canal, '{0.mention} entrou aqui no dia {1}'.format(member, tempo))
+	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\nLeias as regras para ter acesso completo ao servidor.')
 	
+
 #=================================================CODIGOS=================================================#
 
 
@@ -113,6 +112,23 @@ async def on_message(message):
 		await attcodigo()
 		await bot.add_roles(message.author, cargomembro)
 
+	if not message.content.startswith('!') and not message.channel == canal_codigo:
+		usuario = message.author
+		await user_bd.set_xp(usuario.id, random.randint(1, 3))
+		usuario_level = await user_bd.get_level(usuario.id)
+		usuario_xp = await user_bd.get_xp(usuario.id)
+		if usuario_level == 0:
+			await user_bd.set_level(usuario.id, 1)
+			await user_bd.set_eris(usuario.id, 10)
+		upxp = (usuario_level * usuario_level)*10
+		if usuario_xp >= upxp:
+			await user_bd.set_level(usuario.id, 1)
+			await user_bd.set_eris(usuario.id, 10)
+			embed = discord.Embed(color=0x06ff2c)
+			embed.set_thumbnail(url=usuario.avatar_url)
+			embed.add_field(name=usuario.name, value='Upou para o **level {}**!'.format(usuario_level+1), inline=False)
+			embed.add_field(name='Ganhou', value='**10** Eris.' )
+			await bot.send_message(message.channel, embed=embed)
 
 	if message.author.id == "397606105594986499" and not message.content.startswith('!'):
 		await bot.add_reaction(message, '🇹')
@@ -121,8 +137,7 @@ async def on_message(message):
 		await bot.add_reaction(message, '🇦')
 		await bot.add_reaction(message, '🇲')
 		await bot.add_reaction(message, '🇴')
-	global msgcount
-	msgcount +=1
+
 	
 	await bot.process_commands(message)
 
@@ -134,7 +149,6 @@ async def on_message(message):
 async def convite():
 	"""Envia um convite do servidor."""
 	await bot.say('discord.gg/V2WUn6M')
-	print(msgcode)
 
 #DELETE
 @bot.command(pass_context=True)
@@ -173,20 +187,6 @@ async def diz_error(ctx, error):
 	if Exception == 'BadArgument':
 		await bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
 
-
-#LEGAL
-@bot.command(pass_context=True)
-async def legal(ctx, member: discord.Member = None):
-	"""Informa se você ou o membro marcado é legal"""
-	if member is None:
-		member = ctx.message.author
-	result = random.randint(1, 2)
-	if result == 1:
-		await bot.say('Não, {0.mention} não é legal.'.format(member))
-	if result == 2:	
-		await bot.say('Sim, {0.mention} é legal.'.format(member))
-
-
 #PING		
 @bot.command(pass_context=True)
 async def ping(ctx):
@@ -218,13 +218,13 @@ async def senha_error(ctx, error):
 
 
 if __name__ == "__main__":
-    for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
-        try:
-            bot.load_extension(cogs_dir + "." + extension)
-            print(f'{extension} carregada com sucesso.')
-        except Exception as e:
-            print(f'erro ao carregar {extension}.')
-            traceback.print_exc()
+	for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+		try:
+			bot.load_extension(cogs_dir + "." + extension)
+			print(f'{extension} carregada com sucesso.')
+		except Exception as e:
+			print(f'erro ao carregar {extension}.')
+			traceback.print_exc()
 
 
 bot.run(token)
