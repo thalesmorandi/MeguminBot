@@ -10,12 +10,6 @@ from discord.ext import commands
 class Misc:
     def __init__(self, bot):
         self.bot = bot
-
-    async def randomsenha(N:int):
-        randomsenha : str
-        randomsenha = ''
-        randomsenha = randomsenha.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(N))
-        return randomsenha
     
     #DIZ
     @commands.command(pass_context=True)
@@ -28,7 +22,6 @@ class Misc:
         if Exception == 'BadArgument':
             await self.bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
 
-
     #REPETE
     @commands.command()
     async def repete(self, x : int,* , content='repetindo...'):
@@ -37,17 +30,15 @@ class Misc:
             await asyncio.sleep(1)
             await self.bot.say(content)
 
-
     #SENHA
     @commands.command(pass_context=True)
-    async def senha(self, ctx, N:int=8):
+    async def senha(self, ctx, N=8):
         """Gera uma senha de acordo com a quantidade de caracteres solicitada !senha <quantidade>."""
-        senha = await randomsenha(N)
+        senha = await Misc.randomsenha(N)
         await self.bot.say(senha)
 #    @senha.error
 #    async def senha_error(self, ctx, error):
 #        await self.bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
-
 
     #PING        
     @commands.command(pass_context=True)
@@ -57,7 +48,6 @@ class Misc:
         d = datetime.utcnow() - ctx.message.timestamp
         s = d.seconds * 1000 + d.microseconds // 1000
         await self.bot.say(":ping_pong: Pong! com {}ms".format(s))
-
 
     #CONVITE
     @commands.command()
@@ -70,6 +60,12 @@ class Misc:
     async def donate(self):
         """Envia links que te permitem contruibuir com o bot."""
         await self.bot.say('aaa')    
+
+    async def randomsenha(N:int):
+        randomsenha : str
+        randomsenha = ''
+        randomsenha = randomsenha.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(N))
+        return randomsenha
 
 def setup(bot):
     bot.add_cog(Misc(bot))
