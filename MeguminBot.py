@@ -39,7 +39,6 @@ bot = Bot(description="Uma maga disposta a fazer muitos truques por vc (づ｡�
 
 #=================================================VARIAVEIS=================================================#
 
-msgcount = 0
 cogs_dir = "cogs"
 codigofile = open("codigo/codigo.txt", "r")
 codigo=codigofile.read()
@@ -58,11 +57,9 @@ async def attcodigo():
 	await bot.edit_message(msgcode, '**Coloque o codigo abaixo em #codigo para ter seu cargo de membro e poder usar o resto do nosso servidor:** \n codigo = ``'+ codigo +'``')
 	await salvarcode()
 
-
 async def salvarcode():
 	codigoarq = open('codigo/codigo.txt', 'w')
 	codigoarq.write(codigo)
-
 
 async def randomstring(N:int):
 	if N == None:
@@ -72,9 +69,7 @@ async def randomstring(N:int):
 	randomstring = randomstring.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(N))
 	return randomstring
 
-
 #==================================================EVENTOS==================================================#
-
 
 @bot.event
 async def on_ready():
@@ -91,7 +86,6 @@ async def on_ready():
 	print(is_prod)
 	await attcodigo()
 	return await bot.change_presence(game=discord.Game(name='a raba pro alto'))
-	
 
 @bot.event
 async def on_member_join(member):
@@ -100,10 +94,8 @@ async def on_member_join(member):
 	canal = discord.utils.get(server.channels, name="membrosnovos")
 	await bot.send_message(canal, '{0.mention} entrou aqui no dia {1}'.format(member, tempo))
 	await bot.send_message(member, 'Bem Vindo ao '+ member.server.name + ' ' + member.mention + '\nLeias as regras para ter acesso completo ao servidor.')
-	
 
 #=================================================CODIGOS=================================================#
-
 
 @bot.event
 async def on_message(message):
@@ -126,9 +118,7 @@ async def on_message(message):
 		if usuario_xp >= upxp:
 			await user_bd.set_level(usuario.id, 1)
 			await user_bd.set_eris(usuario.id, 10)
-		
-	
-	
+				
 		await user_bd.set_local_xp(server.id, usuario.id, xpganha)
 		usuario_level = await user_bd.get_local_level(server.id, usuario.id)
 		usuario_xp = await user_bd.get_local_xp(server.id, usuario.id)
@@ -143,8 +133,6 @@ async def on_message(message):
 			embed.add_field(name='Ganhou', value='**10** Eris.' )
 			await bot.send_message(message.channel, embed=embed)
 
-
-
 	if message.author.id == "397606105594986499" and not message.content.startswith('!'):
 		await bot.add_reaction(message, '🇹')
 		await bot.add_reaction(message, '🇪')
@@ -152,84 +140,8 @@ async def on_message(message):
 		await bot.add_reaction(message, '🇦')
 		await bot.add_reaction(message, '🇲')
 		await bot.add_reaction(message, '🇴')
-
 	
 	await bot.process_commands(message)
-
-
-#=================================================COMANDOS=================================================#
-
-#CONVITE
-@bot.command()
-async def convite():
-	"""Envia um convite do servidor."""
-	await bot.say('discord.gg/V2WUn6M')
-
-#DELETE
-@bot.command(pass_context=True)
-async def delete(ctx, amount, channel: discord.Channel=None):
-	"""Deleta a quantidade de mensagens desejada !delete <quantidade>."""
-	channel = channel or ctx.message.channel
-	deleteds = 0
-	total = amount
-	try:
-		amount = int(amount)
-		await bot.delete_message(ctx.message)
-		if amount > 100:
-			amountdiv = int(amount/100)
-			amountrest = amount-(amountdiv*100)
-			for amount in range(amount, amountrest, -100):
-				deleted = await bot.purge_from(channel, limit=amount)
-				deleteds = deleteds + len(deleted)
-		else:
-			deleted = await bot.purge_from(channel, limit=amount)
-			deleteds = deleteds + len(deleted)
-	except ValueError:
-		await bot.say('Utilize o comando com uma quantidade valida : ```!delete <quantidade>```')
-	botmsgdelete = await bot.send_message(ctx.message.channel,'Deletei {} mensagens de um pedido de {} no canal {} para {}'.format(deleteds, total, channel.mention,ctx.message.author.mention))
-	await asyncio.sleep(5)
-	await bot.delete_message(botmsgdelete)
-
-
-#DIZ
-@bot.command(pass_context=True)
-async def diz(ctx, *, msg: str):
-	"""Repete uma mensagem /diz"""
-	msg = re.sub('´', '`', msg)
-	await bot.say(msg)
-@diz.error
-async def diz_error(ctx, error):
-	if Exception == 'BadArgument':
-		await bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
-
-#PING		
-@bot.command(pass_context=True)
-async def ping(ctx):
-	"""Responde com Pong e a latencia."""
-
-	d = datetime.utcnow() - ctx.message.timestamp
-	s = d.seconds * 1000 + d.microseconds // 1000
-	await bot.say(":ping_pong: Pong! com {}ms".format(s))
-
-
-#REPETE
-@bot.command()
-async def repete(x : int,* , content='repetindo...'):
-	"""Repete uma mensagem x vezes /repete x msg."""
-	for i in range(x):
-		await asyncio.sleep(1)
-		await bot.say(content)
-
-
-#SENHA
-@bot.command(pass_context=True)
-async def senha(ctx, N:int):
-	"""Gera uma senha de acordo com a quantidade de caracteres solicitada !senha <quantidade>."""
-	codigos = await randomstring(N)
-	await bot.say(codigos)
-@senha.error
-async def senha_error(ctx, error):
-	await bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
 
 
 if __name__ == "__main__":

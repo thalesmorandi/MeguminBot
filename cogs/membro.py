@@ -49,7 +49,7 @@ class Membro():
             avatar_url = member.avatar_url
         embedperfil.set_thumbnail(url=avatar_url)
         embedperfil.add_field(name='Informação', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}\nReputação: {4}'.format(locallevel, localexp, localbarra, localxpe, rep))
-        embedperfil.add_field(name='Informação global', value='Level: {0} ({1})\n{2}\nRank: #1'.format(level, exp, barra))
+        embedperfil.add_field(name='Informação global', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}'.format(level, exp, barra, xpe))
         embedperfil.add_field(name='Eris', value='{} 💠'.format(eris))
         #if couple.name not is None:
             #embedperfil.add_field(name='Casado com', value='💕 {}'.format(couple.name))
@@ -63,7 +63,7 @@ class Membro():
         """Informa o level do membro ou seu."""
         if member is None:
             member = ctx.message.author       
-        level = await user_bd.get_level(member.id)
+        level = await user_bd.get_local_level(message.server.id, member.id)
         embedlevel = discord.Embed(title='{.name}'.format(member), description='É level : {}'.format(level))
         await self.bot.send_message(ctx.message.channel, embed=embedlevel)              
 
@@ -72,7 +72,9 @@ class Membro():
         """Informa a xp do membro ou sua."""
         if member is None:
             member = ctx.message.author
-        await self.bot.send_message(ctx.message.channel, "O membro {} possui `{}` XP!".format(member.mention, await user_bd.get_xp(member.id)))
+        xp = await user_bd.get_local_xp(ctx.message.server.id, member.id)
+        embedxp = discord.Embed(title='{.name}'.format(member), description='Possui {} XP!'.format(xp))
+        await self.bot.send_message(ctx.message.channel, embed=embedxp)
 
     @commands.command(pass_context=True)
     async def rep(self, ctx, member: discord.Member = None):
