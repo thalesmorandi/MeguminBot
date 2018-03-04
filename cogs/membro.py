@@ -25,15 +25,22 @@ class Membro():
         await self.bot.say('Utilize o comando corretamente digitando ```!apelido apelido novo```')
 
     @commands.command(pass_context=True)
-    async def perfil(self, ctx, member: discord.Member = None):
+    @commands.cooldown(1, 10, commands.BucketType.user)    
+    async def perfil(self,  ctx, member: discord.Member = None):
+        """Exibe o seu perfil ou de um membro."""
         if member is None:
             member = ctx.message.author
-        """Exibe o seu perfil ou de um membro."""
+        server = ctx.message.server
+        rep = await user_bd.get_rep(member.id)
         eris = await user_bd.get_eris(member.id)
         xpe = await user_bd.get_xp(member.id)
         level = await user_bd.get_level(member.id)
         barra = await user_bd.get_xpbar(member.id)
         exp = await user_bd.get_exp(member.id)        
+        localxpe = await user_bd.get_local_xp(server.id, member.id)
+        locallevel = await user_bd.get_local_level(server.id, member.id)
+        localbarra = await user_bd.get_local_xpbar(server.id, member.id)
+        localexp = await user_bd.get_local_exp(server.id, member.id)        
         tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
         embedperfil = discord.Embed(title="Perfil do membro: " + member.name, color=0x46EEFF)
         if member.avatar_url == "":
@@ -41,7 +48,7 @@ class Membro():
         else:
             avatar_url = member.avatar_url
         embedperfil.set_thumbnail(url=avatar_url)
-        embedperfil.add_field(name='Informação', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}\nReputação: 0'.format(level, exp, barra, xpe))
+        embedperfil.add_field(name='Informação', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}\nReputação: {4}'.format(locallevel, localexp, localbarra, localxpe, rep))
         embedperfil.add_field(name='Informação global', value='Level: {0} ({1})\n{2}\nRank: #1'.format(level, exp, barra))
         embedperfil.add_field(name='Eris', value='{} 💠'.format(eris))
         #if couple.name not is None:
@@ -50,6 +57,46 @@ class Membro():
         embedperfil.add_field(name='Conquistas', value='Nenhuma (ainda!)')
         embedperfil.set_footer(text='membro desde '+ tempo +' | tempo de resposta: 150ms')
         await self.bot.send_message(ctx.message.channel, embed=embedperfil)
+
+    @commands.command(pass_context=True)
+    async def level(self, ctx, member: discord.Member = None):
+        """Informa o level do membro ou seu."""
+        if member is None:
+            member = ctx.message.author       
+        level = await user_bd.get_level(member.id)
+        embedlevel = discord.Embed(title='{.name}'.format(member), description='É level : {}'.format(level))
+        await self.bot.send_message(ctx.message.channel, embed=embedlevel)              
+
+    @commands.command(pass_context=True)
+    async def xp(self, ctx, member: discord.Member = None):
+        """Informa a xp do membro ou sua."""
+        if member is None:
+            member = ctx.message.author
+        await self.bot.send_message(ctx.message.channel, "O membro {} possui `{}` XP!".format(member.mention, await user_bd.get_xp(member.id)))
+
+    @commands.command(pass_context=True)
+    async def rep(self, ctx, member: discord.Member = None):
+        """Informa a reputação do membro ou sua."""
+        if member is None:
+            member = ctx.message.author
+        rep = await user_bd.get_rep(member.id)
+        embedrep = discord.Embed(title='Reputação', description='{0.name} possui {1} pontos de reputação'.format(member, rep))
+        await self.bot.send_message(ctx.message.channel, embed=embedrep)
+    
+    @commands.command(pass_context=True)
+    @commands.cooldown(3, 86400, commands.BucketType.user)        
+    async def giverep(self, ctx, member: discord.Member = None):
+        """Envia pontos de reputação para um membro (limite de 3 a cada 24hrs.)"""
+        if member == ctx.message.author: 
+            embedrepaddself = discord.Embed(title='Reputação', description='Não é possivel conceder pontos de reputação a sí mesmo.')            
+            await self.bot.send_message(ctx.message.channel, embed=embedrepaddself)
+        else:
+            await user_bd.set_rep(member.id, 1)
+            embedrepadd = discord.Embed(title='Reputação', description='{0.name} concedeu 1 ponto de reputação à {1.name}'.format(ctx.message.author, member))
+            await self.bot.send_message(ctx.message.channel, embed=embedrepadd)
+    @giverep.error
+    async def giverep_error(self, ctx, error):
+        await self.bot.say('Você já enviou suas 3 reputações hoje.')
 
     @commands.command(pass_context=True)
     async def entrou(self, ctx, member: discord.Member = None):

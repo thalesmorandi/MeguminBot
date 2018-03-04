@@ -114,7 +114,9 @@ async def on_message(message):
 
 	if not message.content.startswith('!') and not message.channel == canal_codigo:
 		usuario = message.author
-		await user_bd.set_xp(usuario.id, random.randint(1, 3))
+		server = message.server
+		xpganha = random.randint(1, 3)
+		await user_bd.set_xp(usuario.id, xpganha)
 		usuario_level = await user_bd.get_level(usuario.id)
 		usuario_xp = await user_bd.get_xp(usuario.id)
 		if usuario_level == 0:
@@ -124,11 +126,24 @@ async def on_message(message):
 		if usuario_xp >= upxp:
 			await user_bd.set_level(usuario.id, 1)
 			await user_bd.set_eris(usuario.id, 10)
+		
+	
+	
+		await user_bd.set_local_xp(server.id, usuario.id, xpganha)
+		usuario_level = await user_bd.get_local_level(server.id, usuario.id)
+		usuario_xp = await user_bd.get_local_xp(server.id, usuario.id)
+		if usuario_level == 0:
+			await user_bd.set_local_level(server.id, usuario.id, 1)
+		upxp = (usuario_level * usuario_level)*10
+		if usuario_xp >= upxp:
+			await user_bd.set_local_level(server.id, usuario.id, 1)
 			embed = discord.Embed(color=0x06ff2c)
 			embed.set_thumbnail(url=usuario.avatar_url)
 			embed.add_field(name=usuario.name, value='Upou para o **level {}**!'.format(usuario_level+1), inline=False)
 			embed.add_field(name='Ganhou', value='**10** Eris.' )
 			await bot.send_message(message.channel, embed=embed)
+
+
 
 	if message.author.id == "397606105594986499" and not message.content.startswith('!'):
 		await bot.add_reaction(message, '🇹')

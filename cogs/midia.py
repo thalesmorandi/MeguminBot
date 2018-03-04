@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
-class midia():
+class Midia():
     def __init__(self, bot):
         self.bot = bot
     
@@ -59,4 +59,4 @@ class midia():
 
 
 def setup(bot):
-    bot.add_cog(midia(bot))
+    bot.add_cog(Midia(bot))

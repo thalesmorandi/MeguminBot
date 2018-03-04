@@ -5,7 +5,7 @@ from discord.ext import commands
 from utils.chat_formatting import pagify
 
 
-class Penis:
+class Baixarias:
     def __init__(self, bot):
         self.bot = bot
 
@@ -35,4 +35,4 @@ class Penis:
 
 
 def setup(bot):
-    bot.add_cog(Penis(bot))
+    bot.add_cog(Baixarias(bot))

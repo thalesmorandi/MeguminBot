@@ -4,25 +4,10 @@ import os
 import json
 import os.path
 import asyncpg
-
-is_prod = os.environ.get('IS_HEROKU', None)
-
-
-if is_prod:
-    dbuser = os.environ.get('USER')
-    dbpassword = os.environ.get('PASSWORD')
-    dbdatabase = os.environ.get('DATABASE')
-    dbhost = os.environ.get('HOST')
-else:
-    from utils import configdb
-    dbuser = configdb.dbuser
-    dbpassword = configdb.dbpassword
-    dbdatabase = configdb.dbdatabase
-    dbhost = configdb.dbhost
     
 async def get_xp(user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         xp = await conn.fetch('''SELECT xp FROM public.users WHERE ID ={}'''.format(user_id))       
         xpr = xp[0]
         xp = xpr['xp']
@@ -33,7 +18,7 @@ async def get_xp(user_id):
 
 async def get_level(user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         level = await conn.fetch('''SELECT level FROM public.users WHERE ID ={}'''.format(user_id))       
         levelr = level[0]
         level = levelr['level']
@@ -45,7 +30,7 @@ async def get_level(user_id):
 
 async def get_eris(user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         eris = await conn.fetch('''SELECT eris FROM public.users WHERE ID ={}'''.format(user_id))       
         erisr = eris[0]
         eris = erisr['eris']
@@ -56,7 +41,7 @@ async def get_eris(user_id):
 
 async def get_rep(user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         rep = await conn.fetch('''SELECT rep FROM public.users WHERE ID ={}'''.format(user_id))       
         repr = rep[0]
         rep = repr['rep']
@@ -66,7 +51,7 @@ async def get_rep(user_id):
         return 0
 
 async def set_rep(user_id: int, repadd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     rep = await conn.fetch('''SELECT rep FROM public.users WHERE ID ={}'''.format(user_id))       
     repr = rep[0]
     rep = repr['rep']
@@ -74,7 +59,7 @@ async def set_rep(user_id: int, repadd: int):
     await conn.close()
 
 async def set_xp(user_id, xpadd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     xp = await conn.fetch('''SELECT xp FROM public.users WHERE ID ={}'''.format(user_id))       
     try:
         xpr = xp[0]
@@ -86,7 +71,7 @@ async def set_xp(user_id, xpadd: int):
         await conn.close()
 
 async def set_level(user_id, leveladd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     level = await conn.fetch('''SELECT level FROM public.users WHERE ID ={}'''.format(user_id))       
     levelr = level[0]
     level = levelr['level']
@@ -95,7 +80,7 @@ async def set_level(user_id, leveladd: int):
 
 
 async def set_eris(user_id: int, erisadd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     eris = await conn.fetch('''SELECT eris FROM public.users WHERE ID ={}'''.format(user_id))       
     erisr = eris[0]
     eris = erisr['eris']
@@ -180,7 +165,7 @@ async def get_xpbar(user_id:int):
 
 async def get_local_xp(server_id, user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         xp = await conn.fetch('''SELECT localxp FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
         xpr = xp[0]
         xp = xpr['localxp']
@@ -191,7 +176,7 @@ async def get_local_xp(server_id, user_id):
 
 async def get_local_level(server_id, user_id):
     try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
         level = await conn.fetch('''SELECT locallevel FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
         levelr = level[0]
         level = levelr['locallevel']
@@ -202,7 +187,7 @@ async def get_local_level(server_id, user_id):
         return 1
 
 async def set_local_xp(server_id, user_id, xpadd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     xp = await conn.fetch('''SELECT localxp FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
     try:
         xpr = xp[0]
@@ -214,7 +199,7 @@ async def set_local_xp(server_id, user_id, xpadd: int):
         await conn.close()
 
 async def set_local_level(server_id, user_id, leveladd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    conn = await asyncpg.connect(user='postgres', password='8381850', database='teste', host='127.0.0.1')        
     level = await conn.fetch('''SELECT locallevel FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
     levelr = level[0]
     level = levelr['locallevel']

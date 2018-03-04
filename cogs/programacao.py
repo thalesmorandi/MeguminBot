@@ -2,7 +2,7 @@ import discord
 import re
 from discord.ext import commands
 
-class programacao():
+class Programacao():
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class programacao():
 
 
 def setup(bot):
-    bot.add_cog(programacao(bot))
+    bot.add_cog(Programacao(bot))
