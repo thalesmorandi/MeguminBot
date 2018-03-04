@@ -10,10 +10,8 @@
 	</p>
 </div> 
 
-## [Bem vindo](https://discord.me/discordialol) 
+## [Bem vindo, Acesse nosso discord clicando aqui.](https://discord.me/discordialol) 
 
-
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/thalesmorandi/meguminbot)
 
 ## Recursos
 
@@ -21,17 +19,18 @@
 * Comandos de emoji global
 * Comandos de embed complexos
 * Comandos diversos
+* Sistema de leveis (local e global)
+* Sistema de economia (Eris)
+* Sistema de token unica para membros novos
 * Facil de fazer seus própios comandos
 * Community Cogs *(em breve, entre no [nosso Discord](https://discord.me/discordialol) for updates)*
 
 Se você deseja solicitar recursos, [crie um issue](https://github.com/thalesmorandi/meguminbot/issues) nesse repositorio.
 
 
-This is a `stateless selfbot` (Saves no data) *This means that you can [host it on heroku](https://github.com/verixx/selfbot/wiki/Heroku) 24/7 for free*  
-
 ## Cogs
 
-**This is coming soon, so it's not working at the moment.**
+**Em breve.**
 
 
 ## Acknowledgements 
