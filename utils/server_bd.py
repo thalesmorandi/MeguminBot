@@ -29,6 +29,7 @@ async def get_server_codigo(server_id):
         await conn.close()
         return codigo
     except:
+        await conn.close()
         return 0
 
 async def get_server_codigo_ligado(server_id):
@@ -39,7 +40,8 @@ async def get_server_codigo_ligado(server_id):
         ligado = ligador['ligado']
         await conn.close()
         return ligado
-    except:        
+    except:    
+        await conn.close()    
         return 0
 
 async def set_server_codigo(server_id, codigo):
@@ -68,7 +70,8 @@ async def get_canal_codigo(server_id):
         canal_codigo = canal_codigor['canal_codigo']
         await conn.close()
         return canal_codigo
-    except:        
+    except:
+        await conn.close()        
         return 0
 
 async def set_canal_codigo(server_id, canal_codigo):
