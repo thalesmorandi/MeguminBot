@@ -29,6 +29,7 @@ async def get_xp(user_id):
         await conn.close()
         return xp
     except:
+        await conn.close()
         return 0
 
 async def get_level(user_id):
@@ -39,8 +40,8 @@ async def get_level(user_id):
         level = levelr['level']
         await conn.close()
         return level
-
-    except:        
+    except:
+        await conn.close()        
         return 1
 
 async def get_eris(user_id):
@@ -51,7 +52,8 @@ async def get_eris(user_id):
         eris = erisr['eris']
         await conn.close()
         return eris
-    except:        
+    except:
+        await conn.close()        
         return 10
 
 async def get_rep(user_id):
@@ -62,7 +64,8 @@ async def get_rep(user_id):
         rep = repr['rep']
         await conn.close()
         return rep
-    except:        
+    except:
+        await conn.close()        
         return 0
 
 async def set_rep(user_id: int, repadd: int):
@@ -187,6 +190,7 @@ async def get_local_xp(server_id, user_id):
         await conn.close()
         return xp
     except:
+        await conn.close()
         return 0
 
 async def get_local_level(server_id, user_id):
@@ -198,7 +202,8 @@ async def get_local_level(server_id, user_id):
         await conn.close()
         return level
 
-    except:        
+    except:
+        await conn.close()        
         return 1
 
 async def set_local_xp(server_id, user_id, xpadd: int):
