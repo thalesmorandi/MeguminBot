@@ -26,9 +26,7 @@ class Programacao():
         await self.bot.delete_message(ctx.message)
         await self.bot.say('**{0} enviou o seguinte codigo : **\n```py\n{1}\n```'.format(ctx.message.author.mention, code))
         await self.bot.say('**~> ` <~ (cráses)  são trocadas por  (agudo) ~> ´ <~**')
-    @py.error
-    async def py_error(self, ctx, error):
-        await self.bot.say('Use o comando corretamente digitando !py <codigo>')        
+        
 
 
 def setup(bot):

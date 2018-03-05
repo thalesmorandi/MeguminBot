@@ -44,7 +44,6 @@ class Misc:
     @commands.command(pass_context=True)
     async def ping(self, ctx):
         """Responde com Pong e a latencia."""
-
         d = datetime.utcnow() - ctx.message.timestamp
         s = d.seconds * 1000 + d.microseconds // 1000
         await self.bot.say(":ping_pong: Pong! com {}ms".format(s))
@@ -53,13 +52,13 @@ class Misc:
     @commands.command()
     async def convite(self):
         """Envia um convite do servidor."""
-        await self.bot.say('discord.gg/V2WUn6M')
+        await self.bot.say('discord.gg/SyBkxmR')
     
     #DONATE
     @commands.command()
     async def donate(self):
         """Envia links que te permitem contruibuir com o bot."""
-        await self.bot.say('aaa')    
+        await self.bot.say('https://u.muxy.io/tip/tmpoarr')    
 
     async def randomsenha(N:int):
         randomsenha : str

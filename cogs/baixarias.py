@@ -9,7 +9,7 @@ class Baixarias:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, hidden=True)
     async def penis(self, ctx, *users: discord.Member):
         """RSRS"""
         if not users:

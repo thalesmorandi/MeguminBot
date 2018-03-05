@@ -25,38 +25,54 @@ class Membro():
         await self.bot.say('Utilize o comando corretamente digitando ```!apelido apelido novo```')
 
     @commands.command(pass_context=True)
+    async def avatar(self, ctx, member: discord.Member = None):
+        """Exibe a sua ft de perfil ou de um membro"""
+        if member is None:
+            member = ctx.message.author
+            if member.avatar_url == "":
+                self.bot.say('Você não possui foto de perfil')
+            else:
+                await self.bot.say(embed=discord.Embed().set_image(url=member.avatar_url))
+        else:
+            if member.avatar_url == "":
+                self.bot.say('{} não possui foto de perfil'.format(member.name))
+            else:
+                await self.bot.say(embed=discord.Embed().set_image(url=member.avatar_url))
+
+    @commands.command(pass_context=True)
     @commands.cooldown(1, 10, commands.BucketType.user)    
     async def perfil(self,  ctx, member: discord.Member = None):
         """Exibe o seu perfil ou de um membro."""
         if member is None:
             member = ctx.message.author
-        server = ctx.message.server
-        rep = await user_bd.get_rep(member.id)
-        eris = await user_bd.get_eris(member.id)
-        xpe = await user_bd.get_xp(member.id)
-        level = await user_bd.get_level(member.id)
-        barra = await user_bd.get_xpbar(member.id)
-        exp = await user_bd.get_exp(member.id)        
-        localxpe = await user_bd.get_local_xp(server.id, member.id)
-        locallevel = await user_bd.get_local_level(server.id, member.id)
-        localbarra = await user_bd.get_local_xpbar(server.id, member.id)
-        localexp = await user_bd.get_local_exp(server.id, member.id)        
-        tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
-        embedperfil = discord.Embed(title="Perfil do membro: " + member.name, color=0x46EEFF)
-        if member.avatar_url == "":
-            avatar_url='http://www.bool-tech.com/wp-content/uploads/bb-plugin/cache/WBBQ55TF_o-square.jpg'
-        else:
-            avatar_url = member.avatar_url
-        embedperfil.set_thumbnail(url=avatar_url)
-        embedperfil.add_field(name='Informação', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}\nReputação: {4}'.format(locallevel, localexp, localbarra, localxpe, rep))
-        embedperfil.add_field(name='Informação global', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}'.format(level, exp, barra, xpe))
-        embedperfil.add_field(name='Eris', value='{} 💠'.format(eris))
-        #if couple.name not is None:
-            #embedperfil.add_field(name='Casado com', value='💕 {}'.format(couple.name))
-        embedperfil.add_field(name='Comando favorito', value='help (18)')  
-        embedperfil.add_field(name='Conquistas', value='Nenhuma (ainda!)')
-        embedperfil.set_footer(text='membro desde '+ tempo +' | tempo de resposta: 150ms')
-        await self.bot.send_message(ctx.message.channel, embed=embedperfil)
+        if member.bot is False:
+            server = ctx.message.server
+            rep = await user_bd.get_rep(member.id)
+            eris = await user_bd.get_eris(member.id)
+            xpe = await user_bd.get_xp(member.id)
+            level = await user_bd.get_level(member.id)
+            barra = await user_bd.get_xpbar(member.id)
+            exp = await user_bd.get_exp(member.id)        
+            localxpe = await user_bd.get_local_xp(server.id, member.id)
+            locallevel = await user_bd.get_local_level(server.id, member.id)
+            localbarra = await user_bd.get_local_xpbar(server.id, member.id)
+            localexp = await user_bd.get_local_exp(server.id, member.id)        
+            tempo = member.joined_at.strftime('%d/%m/%y ás %H:%M')
+            embedperfil = discord.Embed(title="Perfil do membro: " + member.name, color=0x46EEFF)
+            if member.avatar_url == "":
+                avatar_url='http://www.bool-tech.com/wp-content/uploads/bb-plugin/cache/WBBQ55TF_o-square.jpg'
+            else:
+                avatar_url = member.avatar_url
+            embedperfil.set_thumbnail(url=avatar_url)
+            embedperfil.add_field(name='Informação', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}\nReputação: {4}'.format(locallevel, localexp, localbarra, localxpe, rep))
+            embedperfil.add_field(name='Informação global', value='Level: {0} ({1})\n{2}\nRank: #1 | XP Total : {3}'.format(level, exp, barra, xpe))
+            embedperfil.add_field(name='Eris', value='{} 💠'.format(eris))
+            #if couple.name not is None:
+                #embedperfil.add_field(name='Casado com', value='💕 {}'.format(couple.name))
+            embedperfil.add_field(name='Comando favorito', value='help (18)')  
+            embedperfil.add_field(name='Conquistas', value='Nenhuma (ainda!)')
+            embedperfil.set_footer(text='membro desde '+ tempo +' | tempo de resposta: 150ms')
+            await self.bot.send_message(ctx.message.channel, embed=embedperfil)
 
     @commands.command(pass_context=True)
     async def level(self, ctx, member: discord.Member = None):
