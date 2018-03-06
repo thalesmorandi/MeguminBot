@@ -20,13 +20,15 @@ else:
 	token = config.bottoken
 
 client = discord.Client()
-bot = Bot(description="Uma maga disposta a fazer muitos truques por vc (づ｡◕‿‿◕｡)づ", command_prefix=commands.when_mentioned_or('!'), pm_help = False)
-
+bot = Bot(description="Uma maga disposta a fazer muitos truques por vc (づ｡◕‿‿◕｡)づ", command_prefix=commands.when_mentioned_or('!'), pm_help = False, help_attrs=dict(hidden=True, brief="Magicos não precisam de ajuda... ou precisam rs"))
+bot.remove_command('help')
 cogs_dir = "cogs"
+
+	
 
 @bot.event
 async def on_ready():
-	print('Logada como '+bot.user.name+' (ID:'+bot.user.id+') | Conectada a '+str(len(bot.servers))+' seridores | Em contato com '+str(len(set(bot.get_all_members())))+' usuarios')
+	print('Logada como '+bot.user.name+' (ID:'+bot.user.id+') | Conectada a '+str(len(bot.servers))+' servidores | Em contato com '+str(len(set(bot.get_all_members())))+' usuarios')
 	print('-------------------------------------------------------------------------------------------------')
 	print('Versão do Discord.py : {} | Versão do Python : {}'.format(discord.__version__, platform.python_version()))
 	print('-------------------------------------------------------------------------------------------------')
@@ -86,9 +88,7 @@ async def on_message(message):
 			embed.add_field(name=usuario.name, value='Upou para o **level {}**!'.format(usuario_level+1), inline=False)
 			embed.add_field(name='Ganhou', value='**10** Eris.' )
 			await bot.send_message(message.channel, embed=embed)
-
 	await bot.process_commands(message)
-
 
 if __name__ == "__main__":
 	for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:

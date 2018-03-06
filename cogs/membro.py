@@ -24,7 +24,7 @@ class Membro():
     async def apelido_error(self, ctx, error):
         await self.bot.say('Utilize o comando corretamente digitando ```!apelido apelido novo```')
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, guild_only=True)
     async def avatar(self, ctx, member: discord.Member = None):
         """Exibe a sua ft de perfil ou de um membro"""
         if member is None:

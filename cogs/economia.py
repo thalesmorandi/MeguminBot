@@ -13,6 +13,13 @@ class Economia():
         await self.bot.send_message(ctx.message.channel, embed=embederis)
 
     @commands.command(pass_context=True)
+    async def diario(self, ctx):
+        """Receba seus Eris diario."""
+        eris = await user_bd.set_eris(ctx.message.author.id, 25)
+        embeddiario = discord.Embed(title='💠 Eris', description='Você recebeu 25 Eris!'.format(ctx.message.author.name, eris))
+        await self.bot.send_message(ctx.message.channel, embed=embeddiario)
+
+    @commands.command(pass_context=True)
     async def enviar(self, ctx, qntdd: int,  member: discord.Member = None):
         """Envia uma quantia de Eris para outro membro."""
         if member == ctx.message.author:
