@@ -13,6 +13,7 @@ class Economia():
         await self.bot.send_message(ctx.message.channel, embed=embederis)
 
     @commands.command(pass_context=True)
+    @commands.cooldown(3, 86400, commands.BucketType.user)
     async def diario(self, ctx):
         """Receba seus Eris diario."""
         eris = await user_bd.set_eris(ctx.message.author.id, 25)
