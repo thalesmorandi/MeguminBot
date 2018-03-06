@@ -71,7 +71,7 @@ class Geral:
             embed.add_field(name="Geral", value="`comandos`, `google`, `serverinfo`, `avatar`, `qr`, `votar`")
             embed.add_field(name="Moderação", value="`renomear`, `kick`, `ban`, `mute`, `unmute`, `delete`")
             embed.add_field(name="Membro", value="`avatar`, `apelido`, `perfil`, `rep`, `giverep`, `xp`, `level`")
-            embed.add_field(name="Diversão", value="`ship`, `penis`, `isnowillegal`, `gif`, `cat`, `dog`, `legal`, `entrou`, `calcularamor`")
+            embed.add_field(name="Diversão", value="`ship`, `isnowillegal`, `gif`, `cat`, `dog`, `legal`, `entrou`, `calcularamor`")
             embed.add_field(name="Economia", value="`eris`, `enviar`, `diario`")
             embed.add_field(name="Midia", value="`youtube`, `gif`")
             embed.add_field(name="Jogos", value="`moeda`")
