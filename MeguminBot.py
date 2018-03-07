@@ -42,52 +42,44 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-	codigo_ligado = await server_bd.get_server_codigo_ligado(message.server.id)
-	if codigo_ligado == 1:
-		canal_codigo = await server_bd.get_canal_codigo(message.server.id)
-		canal_regras = await server_bd.get_canal_regras(message.server.id)	
-		cargo_membro = await server_bd.get_cargo_membro(message.server.id)
-		codigo = await server_bd.get_server_codigo(message.server.id)
-		msgcode = await server_bd.get_msgcode(message.server.id)
-		server = message.server
-		if message.content == codigo and message.channel.id == str(canal_codigo):
-			cargomembro = discord.utils.find(lambda r: r.id == str(cargo_membro), message.server.roles)
-			codigo = ""
-			codigo = codigo.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
-			await server_bd.set_server_codigo(message.server.id, codigo)
-			await bot.add_roles(message.author, cargomembro)
-			channelcodigo=bot.get_channel(str(canal_codigo))
-			channel=bot.get_channel(str(canal_regras))
-			msgcode = await bot.get_message(channel, id=str(msgcode))
-			await bot.edit_message(msgcode, '**Coloque o codigo abaixo em {} para ter seu cargo {} e poder usar o resto do nosso servidor:** \ncodigo = ``{}``'.format(channelcodigo.mention, cargomembro.mention, codigo))
+	if not  message.channel.is_private:
+		codigo_ligado = await server_bd.get_server_codigo_ligado(message.server.id)
+		if codigo_ligado == 1:
+			canal_codigo = await server_bd.get_canal_codigo(message.server.id)
+			canal_regras = await server_bd.get_canal_regras(message.server.id)	
+			cargo_membro = await server_bd.get_cargo_membro(message.server.id)
+			codigo = await server_bd.get_server_codigo(message.server.id)
+			msgcode = await server_bd.get_msgcode(message.server.id)
+			server = message.server
+			if message.content == codigo and message.channel.id == str(canal_codigo):
+				cargomembro = discord.utils.find(lambda r: r.id == str(cargo_membro), message.server.roles)
+				codigo = ""
+				codigo = codigo.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+				await server_bd.set_server_codigo(message.server.id, codigo)
+				await bot.add_roles(message.author, cargomembro)
+				channelcodigo=bot.get_channel(str(canal_codigo))
+				channel=bot.get_channel(str(canal_regras))
+				msgcode = await bot.get_message(channel, id=str(msgcode))
+				await bot.edit_message(msgcode, '**Coloque o codigo abaixo em {} para ter seu cargo {} e poder usar o resto do nosso servidor:** \ncodigo = ``{}``'.format(channelcodigo.mention, cargomembro.mention, codigo))
+		
+		if not message.content.startswith('!') and not message.author.bot is True:
+			usuario = message.author
+			server = message.server
+			xpganha = random.randint(1, 5)
+			usuario_local_xp = await user_bd.get_local_xp(server.id, usuario.id)		
+			usuario_local_level = await user_bd.get_local_level(usuario_local_xp)
+			usuario_new_level = await user_bd.get_local_level(usuario_local_xp+xpganha)
 
-	if not message.content.startswith('!') and not message.author.bot is True:
-		usuario = message.author
-		server = message.server
-		xpganha = random.randint(1, 3)
-		await user_bd.set_xp(usuario.id, xpganha)
-		usuario_level = await user_bd.get_level(usuario.id)
-		usuario_xp = await user_bd.get_xp(usuario.id)
-		if usuario_level == 0:
-			await user_bd.set_level(usuario.id, 1)
-		upxp = (usuario_level * usuario_level)*10
-		if usuario_xp >= upxp:
-			await user_bd.set_level(usuario.id, 1)
-		await user_bd.set_local_xp(server.id, usuario.id, xpganha)
-		usuario_level = await user_bd.get_local_level(server.id, usuario.id)
-		usuario_xp = await user_bd.get_local_xp(server.id, usuario.id)
-		if usuario_level == 0:
-			await user_bd.set_local_level(server.id, usuario.id, 1)
-			await user_bd.set_eris(usuario.id, 10)
-		upxp = (usuario_level * usuario_level)*10
-		if usuario_xp >= upxp:
-			await user_bd.set_local_level(server.id, usuario.id, 1)
-			await user_bd.set_eris(usuario.id, 10)							
-			embed = discord.Embed(color=0x06ff2c)
-			embed.set_thumbnail(url=usuario.avatar_url)
-			embed.add_field(name=usuario.name, value='Upou para o **level {}**!'.format(usuario_level+1), inline=False)
-			embed.add_field(name='Ganhou', value='**10** Eris.' )
-			await bot.send_message(message.channel, embed=embed)
+			if usuario_local_level != usuario_new_level:
+				embed = discord.Embed(color=0x06ff2c)
+				embed.set_thumbnail(url=usuario.avatar_url)
+				embed.add_field(name=usuario.name, value='Upou para o **level {}**!'.format(usuario_local_level+1), inline=False)
+				embed.add_field(name='Ganhou', value='**100** Eris <:eris:420848536444207104>.' )
+				await bot.send_message(message.channel, embed=embed)
+				await user_bd.set_eris(usuario.id, 100)
+			await user_bd.set_xp(usuario.id, xpganha)	
+			await user_bd.set_local_xp(server.id, usuario.id, xpganha)		
+
 	await bot.process_commands(message)
 
 if __name__ == "__main__":

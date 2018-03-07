@@ -32,17 +32,13 @@ async def get_xp(user_id):
         await conn.close()
         return 0
 
-async def get_level(user_id):
-    try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
-        level = await conn.fetch('''SELECT level FROM public.users WHERE ID ={}'''.format(user_id))       
-        levelr = level[0]
-        level = levelr['level']
-        await conn.close()
+async def get_level(xp):
+        remaining_xp = int(xp)
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1
         return level
-    except:
-        await conn.close()        
-        return 1
 
 async def get_eris(user_id):
     try:
@@ -88,15 +84,6 @@ async def set_xp(user_id, xpadd: int):
         await conn.fetch('''INSERT INTO public.users (id, xp, level, eris, rep) VALUES ({0}, {1}, 1, 10, 0)'''.format(user_id, xpadd))       
         await conn.close()
 
-async def set_level(user_id, leveladd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
-    level = await conn.fetch('''SELECT level FROM public.users WHERE ID ={}'''.format(user_id))       
-    levelr = level[0]
-    level = levelr['level']
-    await conn.fetch('''UPDATE public.users SET level = {0} WHERE ID = {1}'''.format(level+leveladd, user_id))       
-    await conn.close()
-
-
 async def set_eris(user_id: int, erisadd: int):
     conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
     eris = await conn.fetch('''SELECT eris FROM public.users WHERE ID ={}'''.format(user_id))       
@@ -107,27 +94,31 @@ async def set_eris(user_id: int, erisadd: int):
 
 async def get_exp(user_id:int):
     xp = await get_xp(user_id)
-    level = await get_level(user_id)
-    if level > 1:
-        levelcalc = level-1
-        xpcalc = ((levelcalc*levelcalc)*10)
-        xpatual =xp - xpcalc
-        xpcalc = ((level*level)*10)-xpcalc
-        exp= str(str(xpatual)+'/'+str(xpcalc))
+    level = await get_level(xp)
+    if level >= 1:
+        remaining_xp = xp
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1        
+        xpcalc = 5*(level**2)+50*level+100
+        exp= str(str(remaining_xp)+'/'+str(xpcalc))
         return exp
     else:
-        exp= str(xp)+'/10'
+        exp= str(xp)+'/100'
         return exp          
 
 async def get_xpbar(user_id:int):
     xp = await get_xp(user_id)
-    level = await get_level(user_id)
-    if level > 1:
-        levelcalc = level-1#1
-        xpcalc = ((levelcalc*levelcalc)*10)#10
-        xpatual = xp - xpcalc #25
-        xpcalc = ((level*level)*10)-xpcalc #30
-        barrasverdes = int(xpatual/(xpcalc/6))
+    level = await get_level(xp)
+    if level >= 1:
+        remaining_xp = xp
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1
+        xpnlevel = 5*((level+1)**2)+50*level+101       
+        barrasverdes = int((remaining_xp/(xpnlevel/6)))
         barrasbrancas = 6 - barrasverdes
         if barrasbrancas==6:
             barra = '<:wbare:419367453613621249><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarr:419367453802627081>'             
@@ -151,11 +142,8 @@ async def get_xpbar(user_id:int):
                                     barra = '<:gbare:419367453739450378><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarr:419367453420683265>'
         return barra    
     else:
-        levelcalc = level-1#1
-        xpcalc = ((levelcalc*levelcalc)*10)#10
-        xpatual =xp - xpcalc #25
-        xpcalc = ((level*level)*10)-xpcalc #30
-        barrasverdes = int(xpatual/(xpcalc/6))
+        xpatual = xp
+        barrasverdes = int(xpatual/(100/6))
         barrasbrancas = 6 - barrasverdes
         if barrasbrancas==6:
             barra = '<:wbare:419367453613621249><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarr:419367453802627081>'             
@@ -193,18 +181,13 @@ async def get_local_xp(server_id, user_id):
         await conn.close()
         return 0
 
-async def get_local_level(server_id, user_id):
-    try:
-        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
-        level = await conn.fetch('''SELECT locallevel FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
-        levelr = level[0]
-        level = levelr['locallevel']
-        await conn.close()
+async def get_local_level(xp):
+        remaining_xp = int(xp)
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1
         return level
-
-    except:
-        await conn.close()        
-        return 1
 
 async def set_local_xp(server_id, user_id, xpadd: int):
     conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
@@ -218,37 +201,33 @@ async def set_local_xp(server_id, user_id, xpadd: int):
         await conn.fetch('''INSERT INTO public.serverusers (serverid, memberid, localxp, locallevel) VALUES ({0}, {1}, {2}, 1)'''.format(server_id, user_id, xpadd))       
         await conn.close()
 
-async def set_local_level(server_id, user_id, leveladd: int):
-    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
-    level = await conn.fetch('''SELECT locallevel FROM public.serverusers WHERE serverid ={} and memberid ={}'''.format(server_id, user_id))       
-    levelr = level[0]
-    level = levelr['locallevel']
-    await conn.fetch('''UPDATE public.serverusers SET locallevel = {0} WHERE serverid ={1} and memberid ={2}'''.format(level+leveladd,server_id, user_id))       
-    await conn.close()
-
 async def get_local_exp(server_id, user_id:int):
     xp = await get_local_xp(server_id, user_id)
-    level = await get_local_level(server_id, user_id)
-    if level > 1:
-        levelcalc = level-1
-        xpcalc = ((levelcalc*levelcalc)*10)
-        xpatual =xp - xpcalc
-        xpcalc = ((level*level)*10)-xpcalc
-        exp= str(str(xpatual)+'/'+str(xpcalc))
+    level = await get_local_level(xp)
+    if level >= 1:
+        remaining_xp = xp
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1        
+        xpcalc = 5*(level**2)+50*level+100
+        exp= str(str(remaining_xp)+'/'+str(xpcalc))
         return exp
     else:
-        exp= str(xp)+'/10'
+        exp= str(xp)+'/100'
         return exp  
 
 async def get_local_xpbar(server_id, user_id:int):
     xp = await get_local_xp(server_id, user_id)
-    level = await get_local_level(server_id, user_id)
-    if level > 1:
-        levelcalc = level-1#1
-        xpcalc = ((levelcalc*levelcalc)*10)#10
-        xpatual = xp - xpcalc #25
-        xpcalc = ((level*level)*10)-xpcalc #30
-        barrasverdes = int(xpatual/(xpcalc/6))
+    level = await get_local_level(xp)
+    if level >= 1:
+        remaining_xp = xp
+        level = 0
+        while remaining_xp >= 5*(level**2)+50*level+100:
+            remaining_xp -= 5*(level**2)+50*level+100
+            level += 1
+        xpnlevel = 5*((level+1)**2)+50*level+101
+        barrasverdes = int((remaining_xp/(xpnlevel/6)))
         barrasbrancas = 6 - barrasverdes
         if barrasbrancas==6:
             barra = '<:wbare:419367453613621249><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarr:419367453802627081>'             
@@ -272,11 +251,8 @@ async def get_local_xpbar(server_id, user_id:int):
                                     barra = '<:gbare:419367453739450378><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarm:419367453609426945><:gbarr:419367453420683265>'
         return barra    
     else:
-        levelcalc = level-1#1
-        xpcalc = ((levelcalc*levelcalc)*10)#10
-        xpatual =xp - xpcalc #25
-        xpcalc = ((level*level)*10)-xpcalc #30
-        barrasverdes = int(xpatual/(xpcalc/6))
+        xpatual = xp
+        barrasverdes = int(xpatual/(100/6))
         barrasbrancas = 6 - barrasverdes
         if barrasbrancas==6:
             barra = '<:wbare:419367453613621249><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarm:419367453475209217><:wbarr:419367453802627081>'             

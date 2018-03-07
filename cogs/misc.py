@@ -36,9 +36,9 @@ class Misc:
         """Gera uma senha de acordo com a quantidade de caracteres solicitada !senha <quantidade>."""
         senha = await Misc.randomsenha(N)
         await self.bot.say(senha)
-#    @senha.error
-#    async def senha_error(self, ctx, error):
-#        await self.bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
+    @senha.error
+    async def senha_error(self, ctx, error):
+        await self.bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
 
     #PING        
     @commands.command(pass_context=True)
@@ -53,11 +53,18 @@ class Misc:
     async def convite(self):
         """Envia um convite do servidor."""
         await self.bot.say('discord.gg/SyBkxmR')
-    
+
+    #REPORTAR
+    @commands.command(pass_context=True)
+    async def reportar(self, ctx, *, report):
+        """Envia um report de bug para o dono do bot"""
+        member = discord.utils.get(self.bot.get_all_members(), id='182635477977923585')
+        await self.bot.send_message(member,f'{ctx.message.author.mention} send : ' + report) 
+
     #DONATE
     @commands.command()
     async def donate(self):
-        """Envia links que te permitem contruibuir com o bot."""
+        """Envia um link para que possa contruibuir com o bot."""
         await self.bot.say('https://u.muxy.io/tip/tmpoarr')    
 
     async def randomsenha(N:int):
