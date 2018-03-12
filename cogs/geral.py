@@ -70,7 +70,7 @@ class Geral:
 
             embed.add_field(name="Geral", value="`comandos`, `google`, `serverinfo`, `avatar`, `qr`, `votar`", inline=False)
             embed.add_field(name="Moderação", value="`renomear`, `kickar`, `banir`, `mutar`, `desmutar`, `delete`", inline=False)
-            embed.add_field(name="Membro", value="`avatar`, `apelido`, `perfil`, `rep`, `giverep`, `xp`, `level`", inline=False)
+            embed.add_field(name="Membro", value="`avatar`, `apelido`, `perfil`, `casar`, ``divorciar`, `rep`, `giverep`, `xp`, `level`", inline=False)
             embed.add_field(name="Diversão", value="`ship`, `isnowillegal`, `gif`, `cat`, `dog`, `legal`, `entrou`, `calcularamor`", inline=False)
             embed.add_field(name="Economia", value="`eris`, `enviar`, `diario`", inline=False)
             embed.add_field(name="Midia", value="`youtube`, `gif`", inline=False)
