@@ -77,7 +77,7 @@ class Geral:
             embed.add_field(name="Jogos", value="`moeda`", inline=False)
             embed.add_field(name="Programação", value="`json`, `py`", inline=False)
             embed.add_field(name="Ações", value="`abraçar`, `beijar`, `carinho`, `socar`", inline=False)
-            embed.add_field(name="Diversos", value="`senha`, `diz`, `repete`, `ping`, `donate`, `convite`, `reportar`", inline=False)
+            embed.add_field(name="Diversos", value="`senha`, `ranking`, `diz`, `repete`, `ping`, `donate`, `convite`, `reportar`", inline=False)
         except Exception as e:
             await self.bot.say(e)
         await self.bot.say(embed=embed)
