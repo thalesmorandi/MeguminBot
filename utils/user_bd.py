@@ -4,7 +4,6 @@ import os
 import json
 import os.path
 import asyncpg
-
 is_prod = os.environ.get('IS_HEROKU', None)
 
 
@@ -50,7 +49,19 @@ async def get_eris(user_id):
         return eris
     except:
         await conn.close()        
-        return 10
+        return 100
+
+async def get_couple(user_id):
+    try:
+        conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+        couple = await conn.fetch('''SELECT couple FROM public.users WHERE ID ={}'''.format(user_id))       
+        coupler = couple[0]
+        couple = coupler['couple']
+        await conn.close()
+        return couple
+    except:
+        await conn.close()        
+        return None
 
 async def get_rep(user_id):
     try:
@@ -61,7 +72,7 @@ async def get_rep(user_id):
         await conn.close()
         return rep
     except:
-        await conn.close()        
+        await conn.close()     
         return 0
 
 async def set_rep(user_id: int, repadd: int):
@@ -81,7 +92,7 @@ async def set_xp(user_id, xpadd: int):
         await conn.fetch('''UPDATE public.users SET xp = {0} WHERE ID = {1}'''.format(xp+xpadd, user_id))       
         await conn.close()
     except:
-        await conn.fetch('''INSERT INTO public.users (id, xp, level, eris, rep) VALUES ({0}, {1}, 1, 10, 0)'''.format(user_id, xpadd))       
+        await conn.fetch('''INSERT INTO public.users (id, xp, eris, rep) VALUES ({0}, {1}, 100, 0)'''.format(user_id, xpadd))       
         await conn.close()
 
 async def set_eris(user_id: int, erisadd: int):
@@ -90,6 +101,18 @@ async def set_eris(user_id: int, erisadd: int):
     erisr = eris[0]
     eris = erisr['eris']
     await conn.fetch('''UPDATE public.users SET eris = {0} WHERE ID = {1}'''.format(eris+erisadd, user_id))       
+    await conn.close()
+
+async def set_couple(user_id: int, couple):
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    await conn.fetch('''UPDATE public.users SET couple = {0} WHERE ID = {1}'''.format(couple, user_id))       
+    await conn.fetch('''UPDATE public.users SET couple = {0} WHERE ID = {1}'''.format(user_id, couple))       
+    await conn.close()
+
+async def unset_couple(user_id: int, couple):
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)
+    await conn.fetch('''UPDATE public.users SET couple = NULL WHERE ID = {}'''.format(couple))       
+    await conn.fetch('''UPDATE public.users SET couple = NULL WHERE ID = {}'''.format(user_id))       
     await conn.close()
 
 async def get_exp(user_id:int):
@@ -198,8 +221,18 @@ async def set_local_xp(server_id, user_id, xpadd: int):
         await conn.fetch('''UPDATE public.serverusers SET localxp = {0} WHERE serverid ={1} and memberid ={2}'''.format(xp+xpadd, server_id, user_id))       
         await conn.close()
     except:
-        await conn.fetch('''INSERT INTO public.serverusers (serverid, memberid, localxp, locallevel) VALUES ({0}, {1}, {2}, 1)'''.format(server_id, user_id, xpadd))       
+        await conn.fetch('''INSERT INTO public.serverusers (serverid, memberid, localxp) VALUES ({0}, {1}, {2})'''.format(server_id, user_id, xpadd))       
         await conn.close()
+
+async def get_local_ranking(server_id):
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    ranking = await conn.fetch('''SELECT memberid, localxp FROM public.serverusers WHERE serverid = {} ORDER BY localxp DESC'''.format(server_id))       
+    return ranking
+
+async def get_ranking():
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
+    ranking = await conn.fetch('''SELECT id, xp FROM public.users ORDER BY xp DESC''')       
+    return ranking
 
 async def get_local_exp(server_id, user_id:int):
     xp = await get_local_xp(server_id, user_id)

@@ -37,7 +37,7 @@ class Moderacao:
             await self.bot.say('você não possui permissão para usar esse comando')
 
     @commands.command(guild_only=True, pass_context=True)
-    async def kick(self, ctx, member: discord.Member, *, reason = None):
+    async def kickar(self, ctx, member: discord.Member, *, reason = None):
         """Kicka um membro do servidor."""
         if ctx.message.author.server_permissions.kick_members:
             await self.bot.kick(member)
@@ -46,7 +46,7 @@ class Moderacao:
             await self.bot.say('você não possui permissão para usar esse comando')
 
     @commands.command(guild_only=True, pass_context=True)
-    async def ban(self, ctx, member: discord.Member):
+    async def banir(self, ctx, member: discord.Member):
         """Bane um membro do servidor."""
         if ctx.message.author.server_permissions.ban_members:
             await self.bot.ban(member)
@@ -65,7 +65,7 @@ class Moderacao:
 
 
     @commands.command(pass_context=True, no_pm=True)
-    async def mute(self, ctx, *, member: discord.Member):
+    async def mutar(self, ctx, *, member: discord.Member):
         """Muta o membro."""
         if ctx.message.author.server_permissions.mute_members:
             cargomute = discord.utils.find(lambda r: r.name == "Mutado", ctx.message.server.roles)
@@ -75,7 +75,7 @@ class Moderacao:
             await self.bot.say('você não possui permissão para usar esse comando')
 
     @commands.command(pass_context=True, no_pm=True)
-    async def unmute(self, ctx, *, member : discord.Member):
+    async def desmutar(self, ctx, *, member : discord.Member):
         """Desmuta o membro."""
         if ctx.message.author.server_permissions.mute_members:
             cargomute = discord.utils.find(lambda r: r.name == "Mutado", ctx.message.server.roles)
@@ -95,7 +95,7 @@ class Moderacao:
             await self.bot.say('você não possui permissão para usar esse comando')
 
     @commands.command(guild_only=True, pass_context=True)
-    async def rename(self, ctx, user : discord.Member, *, nickname =""):
+    async def renomear(self, ctx, user : discord.Member, *, nickname =""):
         """Altera o apelido de um membro"""
         if ctx.message.author.server_permissions.manage_nicknames:
             if nickname == "":
