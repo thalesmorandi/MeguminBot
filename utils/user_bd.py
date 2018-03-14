@@ -227,12 +227,15 @@ async def set_local_xp(server_id, user_id, xpadd: int):
 async def get_local_ranking(server_id):
     conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
     ranking = await conn.fetch('''SELECT memberid, localxp FROM public.serverusers WHERE serverid = {} ORDER BY localxp DESC'''.format(server_id))       
+    await conn.close()
     return ranking
 
 async def get_ranking():
     conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)        
     ranking = await conn.fetch('''SELECT id, xp FROM public.users ORDER BY xp DESC''')       
+    await conn.close()
     return ranking
+
 
 async def get_local_exp(server_id, user_id:int):
     xp = await get_local_xp(server_id, user_id)
