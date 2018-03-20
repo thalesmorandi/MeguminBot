@@ -3,6 +3,6 @@ codigo/codigo.txt.bak
 utils/__pycache__/
 cogs/__pycache__/
 utils/configdb.py
-__pycache__/.
+__pycache__/
 README.MD
 config.py
