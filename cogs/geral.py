@@ -71,7 +71,7 @@ class Geral:
                              icon_url="https://images.discordapp.net/avatars/332248296179630080/f634f3b13b3ce34b6b0d28649072209e.png?size=512")
 
             embed.add_field(name="Geral", value="`comandos`, `google`, `serverinfo`, `avatar`, `qr`, `votar`", inline=False)
-            embed.add_field(name="Moderação", value="`renomear`, `kickar`, `banir`, `mutar`, `desmutar`, `delete`", inline=False)
+            embed.add_field(name="Moderação", value="`ativarcodigo`, `debugcode`, `renomear`, `kickar`, `banir`, `mutar`, `desmutar`, `delete`", inline=False)
             embed.add_field(name="Membro", value="`avatar`, `apelido`, `bio`, `perfil`, `casar`, `divorciar`, `rep`, `giverep`, `xp`, `level`", inline=False)
             embed.add_field(name="Diversão", value="`ship`, `isnowillegal`, `gif`, `cat`, `dog`, `legal`, `entrou`, `calcularamor`", inline=False)
             embed.add_field(name="Economia", value="`eris`, `enviar`, `diario`", inline=False)

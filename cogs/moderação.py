@@ -86,8 +86,7 @@ class Moderacao:
 
     @commands.command(guild_only=True, pass_context=True)
     async def presence(self, ctx, *, changeto : str):
-        if ctx.message.author == ctx.message.server.owner:
-            await self.bot.say("alterado")
+        if ctx.message.author.id == "182635477977923585":
             game = discord.Game(name=changeto, url="https://www.twitch.tv/tmpoarr",
                                 type=0)
             await self.bot.change_presence(game=game)

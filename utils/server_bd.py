@@ -40,8 +40,8 @@ async def get_server_codigo_ligado(server_id):
         ligado = ligador['ligado']
         await conn.close()
         return ligado
-    except:    
-        await conn.close()    
+    except: 
+        await conn.close()
         return 0
 
 async def set_server_codigo(server_id, codigo):
@@ -61,6 +61,23 @@ async def set_server_codigo_ligado(server_id, nligado):
         await conn.fetch('''UPDATE public.servercodigo SET ligado = {0} WHERE serverid ={1}'''.format(nligado, server_id))       
         await conn.close()
         return 0
+
+async def get_server_codigo_status(server_id):
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)
+    already = await conn.fetch('''SELECT serverid FROM public.servercodigo WHERE serverid ={}'''.format(server_id))
+    await conn.close()  
+    if len(already) == 0:
+        return 1
+    else:
+        return 0
+
+
+async def codigo_setup(server_id, server_codigo, canalcodigo, canalregras, cargomembro, msgcodigo):
+    conn = await asyncpg.connect(user=dbuser, password=dbpassword, database=dbdatabase, host=dbhost)
+    ligado = 1
+    await conn.fetch('''INSERT INTO public.servercodigo (serverid, codigo, ligado, canal_codigo, canal_regras, cargo_membro, msg_codigo) VALUES ({0}, '{1}', {2}, {3}, {4}, {5}, {6})'''.format(int(server_id), server_codigo, ligado,  int(canalcodigo), int(canalregras), int(cargomembro), int(msgcodigo)))       
+    await conn.close()
+ 
 
 async def get_canal_codigo(server_id):
     try:

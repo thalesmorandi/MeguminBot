@@ -42,7 +42,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-	if not  message.channel.is_private:
+	if not  message.channel.is_private:	
 		codigo_ligado = await server_bd.get_server_codigo_ligado(message.server.id)
 		if codigo_ligado == 1:
 			canal_codigo = await server_bd.get_canal_codigo(message.server.id)
@@ -61,6 +61,16 @@ async def on_message(message):
 				channel=bot.get_channel(str(canal_regras))
 				msgcode = await bot.get_message(channel, id=str(msgcode))
 				await bot.edit_message(msgcode, '**Coloque o codigo abaixo em {} para ter seu cargo {} e poder usar o resto do nosso servidor:** \ncodigo = ``{}``'.format(channelcodigo.mention, cargomembro.mention, codigo))
+			if message.content == "!debugcode" and message.author == message.server.owner:
+				cargomembro = discord.utils.find(lambda r: r.id == str(cargo_membro), message.server.roles)				
+				codigo = ""
+				codigo = codigo.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+				await server_bd.set_server_codigo(message.server.id, codigo)
+				channelcodigo=bot.get_channel(str(canal_codigo))
+				channel=bot.get_channel(str(canal_regras))
+				msgcode = await bot.get_message(channel, id=str(msgcode))
+				await bot.edit_message(msgcode, '**Coloque o codigo abaixo em {} para ter seu cargo {} e poder usar o resto do nosso servidor:** \ncodigo = ``{}``'.format(channelcodigo.mention, cargomembro.mention, codigo))
+
 		
 		if not message.content.startswith('!') and not message.author.bot is True:
 			usuario = message.author

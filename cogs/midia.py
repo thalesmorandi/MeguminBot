@@ -45,6 +45,12 @@ class Midia():
         id=gif_data["id"]
         url = "https://media.giphy.com/media/"+id+"/giphy.gif"
         await self.bot.say(embed=discord.Embed().set_image(url=url))
+    @gif.error
+    async def gif_error(self, error, ctx):
+        if isinstance(error, commands.BadArgument):
+            await self.bot.say("use o comando digitando `!gif <pesquisa>`")
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.bot.say("use o comando digitando `!gif <pesquisa>`") 
 
     #YOUTUBE
     @commands.command(pass_context=True, aliases=['yt', 'vid', 'video'])
@@ -56,6 +62,12 @@ class Midia():
         output=f"https://www.youtube.com{dir_address}"
         await self.bot.delete_message(ctx.message)
         await self.bot.say(output)
+    @youtube.error
+    async def youtube_error(self, error, ctx):
+        if isinstance(error, commands.BadArgument):
+            await self.bot.say("use o comando digitando `!yt <pesquisa>`")
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.bot.say("use o comando digitando `!yt <pesquisa>`") 
     #CAT
     @commands.command(pass_context=True)
     async def windows(self, ctx):

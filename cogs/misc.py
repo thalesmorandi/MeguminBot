@@ -13,32 +13,45 @@ class Misc:
     
     #DIZ
     @commands.command(pass_context=True)
-    async def diz(self, ctx, *, msg: str):
+    async def diz(self, error, ctx):
         """Repete uma mensagem /diz"""
         msg = re.sub('´', '`', msg)
         await self.bot.say(msg)
+    
     @diz.error
-    async def diz_error(self, ctx, error):
-        if Exception == 'BadArgument':
-            await self.bot.say('Utilize o comando corretamente digitando ```!diz <"mensagem a ser dita">```')
+    async def diz_error(self, error, ctx):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.bot.say("use o comando digitando `!diz <msg a dizer>`") 
 
     #REPETE
     @commands.command()
-    async def repete(self, x : int,* , content='repetindo...'):
+    async def repete(self, x : int,* , content : str):
         """Repete uma mensagem x vezes /repete x msg."""
         for i in range(x):
             await asyncio.sleep(1)
             await self.bot.say(content)
+    @repete.error
+    async def repete_error(self, error, ctx):
+        if isinstance(error, commands.BadArgument):
+            await self.bot.say("use o comando digitando `!repete <numero de vezes a repetir> <msg a repetir>`")
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.bot.say("use o comando digitando `!repete <numero de vezes a repetir> <msg a repetir>`") 
+
 
     #SENHA
     @commands.command(pass_context=True)
-    async def senha(self, ctx, N=8):
+    async def senha(self, ctx, N : int):
         """Gera uma senha de acordo com a quantidade de caracteres solicitada !senha <quantidade>."""
         senha = await Misc.randomsenha(N)
         await self.bot.say(senha)
     @senha.error
-    async def senha_error(self, ctx, error):
-        await self.bot.say('Utilize o comando corretamente digitando ```!senha <numero de caracteres>```')
+    async def senha_error(self, error, ctx):
+        if isinstance(error, commands.BadArgument):
+            await self.bot.say("use o comando digitando `!senha <numero de caracteres>`")
+        if isinstance(error, commands.MissingRequiredArgument):
+            await self.bot.say("use o comando digitando `!senha <numero de caracteres>`") 
+
+
 
     #PING        
     @commands.command(pass_context=True)
