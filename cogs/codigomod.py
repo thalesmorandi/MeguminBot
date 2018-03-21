@@ -24,7 +24,6 @@ class Codemod:
             #gerenciamento de permissões do codigo
             everyone = ctx.message.server.default_role
             overwrite = discord.PermissionOverwrite()
-            print(ctx.message.server.channels)
             for channel in ctx.message.server.channels:
                 overwrite.read_messages = False
                 overwrite.send_messages = False
