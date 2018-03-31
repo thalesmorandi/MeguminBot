@@ -241,7 +241,7 @@ class Membro():
             embedrepaddself = discord.Embed(title='Reputação', description='Não é possivel conceder pontos de reputação a sí mesmo.')            
             await self.bot.send_message(ctx.message.channel, embed=embedrepaddself)
         else:
-            await user_bd.set_rep(ctx.message.id, member.id, 1)
+            await user_bd.set_rep(ctx.message.server.id, member.id, 1)
             embedrepadd = discord.Embed(title='Reputação', description='{0.name} concedeu 1 ponto de reputação à {1.name}'.format(ctx.message.author, member))
             await self.bot.send_message(ctx.message.channel, embed=embedrepadd)
     @giverep.error
