@@ -96,7 +96,9 @@ async def set_rep(server_id, user_id: int, repadd: int):
     rep = await conn.fetch('''SELECT localrep FROM serverusers WHERE serverid ={0} and memberid ={1}'''.format(server_id, user_id))       
     repr = rep[0]
     rep = repr['localrep']
-    await conn.fetch('''UPDATE serverusers SET localrep = {0} WHERE serverid ={1} and memberid ={2}'''.format(rep+repadd, server_id, user_id))              
+    if rep is None:
+        rep = 0
+    await conn.fetch('''UPDATE public.serverusers SET localrep = {0} WHERE serverid ={1} and memberid ={2}'''.format(rep+repadd, server_id, user_id))              
     await conn.close()
 
 async def set_xp(user_id, xpadd: int):
