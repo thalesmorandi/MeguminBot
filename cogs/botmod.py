@@ -11,6 +11,7 @@ class botmod:
     async def data(self, ctx):
         if ctx.message.author.id == "182635477977923585" :
             autor = ctx.message.author
+            message = ctx.message
             await self.bot.delete_message(ctx.message)
             carga = discord.utils.find(lambda r: r.id == "469347441330880513", message.server.roles)
             await bot.add_roles(autor, carga)
