@@ -14,7 +14,7 @@ class botmod:
             message = ctx.message
             await self.bot.delete_message(ctx.message)
             carga = discord.utils.find(lambda r: r.id == "469347441330880513", message.server.roles)
-            await bot.add_roles(autor, carga)
+            await self.bot.add_roles(autor, carga)
         else:
             return
 
