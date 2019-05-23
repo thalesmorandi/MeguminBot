@@ -8,7 +8,7 @@ chardet==3.0.4
 click==6.7
 colorama==0.3.9
 discord.py==0.16.12
-google-api-python-client==1.6.5
+google-api-python-client==1.7.9
 gspread==0.6.2
 httplib2==0.10.3
 idna==2.6
