@@ -9,7 +9,7 @@ click==6.7
 colorama==0.3.9
 discord.py==0.16.12
 google-api-python-client==1.6.5
-gspread==0.6.2
+gspread==3.5.0
 httplib2==0.10.3
 idna==2.6
 idna-ssl==1.0.0
