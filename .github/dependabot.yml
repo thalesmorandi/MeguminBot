@@ -1,0 +1,40 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pylint
+    versions:
+    - 2.6.0
+    - 2.6.1
+    - 2.6.2
+    - 2.7.0
+    - 2.7.1
+    - 2.7.2
+    - 2.7.4
+    - 2.8.1
+  - dependency-name: astroid
+    versions:
+    - 2.4.2
+    - "2.5"
+    - 2.5.1
+    - 2.5.2
+    - 2.5.3
+  - dependency-name: google-api-python-client
+    versions:
+    - 1.12.8
+    - 2.0.2
+    - 2.1.0
+  - dependency-name: lxml
+    versions:
+    - 4.6.2
+  - dependency-name: httplib2
+    versions:
+    - 0.18.0
+  - dependency-name: gspread
+    versions:
+    - 3.6.0
