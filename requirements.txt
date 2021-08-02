@@ -1,5 +1,5 @@
 python==3.6.14
-aiohttp==3.0.5
+aiohttp==3.7.4
 astroid==1.6.1
 async-timeout==2.0.0
 attrs==17.4.0
